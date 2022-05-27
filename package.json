@@ -1,0 +1,25 @@
+{
+  "name": "live-pose-rendering",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/jaismith/live-pose-rendering",
+  "author": "Jai Smith <jksmithnyc@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "yarn build && open index.html && yarn build -- -w",
+    "start": "yarn build && open index.html"
+  },
+  "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1640029074",
+    "@mediapipe/control_utils": "^0.6.1629159505",
+    "@mediapipe/drawing_utils": "^0.3.1620248257",
+    "@mediapipe/hands": "^0.4.1646424915",
+    "matrix-js": "^1.6.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "rollup": "^2.74.1"
+  }
+}
