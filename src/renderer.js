@@ -21,8 +21,8 @@ export class HandRenderer {
     let joints = [];
 
     // make arm
-    var arm1 = new Joint(null, new Vector(-15, 0, 0), new Vector(-8.5, 0, 1), 'arm1', gl);
-    var arm2 = new Joint(arm1, new Vector(-1, 0, 0), new Vector(8, 0, 0), 'arm2', gl);
+    var arm1 = new Joint(null, new Vector(-15, 0, 0), new Vector(-8.75, 0, 0), 'arm1', gl);
+    var arm2 = new Joint(arm1, new Vector(-8, 0, 0), new Vector(-3, 0, 0), 'arm2', gl);
     joints.push(arm1, arm2);
 
     console.log('arm1 joint angle: ' + arm1.mJointAngle);

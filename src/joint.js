@@ -74,24 +74,16 @@ export class Joint {
 
   getLocalMatrix() {
     // Returns the local transform of the current joint
-    // This matrix should rotate by `this.mJointAngle' around `this.mJointAxis'
-    // and then translate by `this.mPosition'
-    let offset = this.mOriginPosition.subtract(this.mParent?.mEndPosition || new Vector(0, 0, 0));
-
     var localMatrix = new Matrix();
     var rotateMatrix = Matrix.rotate(this.mJointAngle, this.mJointAxis.x, this.mJointAxis.y, this.mJointAxis.z);
-    var translateMatrix = Matrix.translate(offset.x, offset.y, offset.z);
+    var translateMatrix = Matrix.translate(this.mOriginPosition.x, this.mOriginPosition.y, this.mOriginPosition.z);
     return localMatrix.multiply(translateMatrix).multiply(rotateMatrix);
   }
 
   getWorldMatrix() {
     // Returns the world transform of the current joint.
-    // This is simply the transform of the parent joint (if any) multiplied by this joint's local transform
-    // Use the getLocalMatrix function you implemented earlier.
-    var worldMatrix = !!this.mParent
-      ? this.mParent.getWorldMatrix()
-      : new Matrix();
-    return worldMatrix.multiply(this.getLocalMatrix());
+    // since we are not using a hierarchy, this is the same as the local transform
+    return this.getLocalMatrix();
   }
 
   computeBindingMatrix() {
@@ -137,8 +129,7 @@ const recomputeJointAngleAndAxis = function(joint) {
   let jointAxis = b1.cross(b2).unit();
   // set some default axis if angle is zero
   if (!jointAxis.length()) jointAxis.x = 1;
-  console.log('jointaxis', jointAxis);
 
-  joint.mJointAngle = angle;
+  joint.mJointAngle = angle * (180 / Math.PI);
   joint.mJointAxis = jointAxis;
 }

@@ -93,7 +93,7 @@ function setupTask(canvasId, taskFunction) {
 
   renderLoop = function() {
     task.render(gl, renderWidth, renderHeight);
-    window.requestAnimationFrame(renderLoop);
+    setTimeout(() => window.requestAnimationFrame(renderLoop), 1000 / 60)
   }
 
   window.requestAnimationFrame(renderLoop);
@@ -101,7 +101,7 @@ function setupTask(canvasId, taskFunction) {
   hands.onResults((results) => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0)
       console.log(results.multiHandLandmarks[0]);
-      // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       // window.requestAnimationFrame(renderLoop);
   });
 
