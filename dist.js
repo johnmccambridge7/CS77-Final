@@ -4323,11 +4323,11 @@ function setupTask(canvasId, taskFunction) {
   hands.onResults((results) => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0)
       console.log(results.multiHandLandmarks[0]);
-      // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       // window.requestAnimationFrame(renderLoop);
   });
 
-  new Camera(videoElement, {
+  const camera = new Camera(videoElement, {
     onFrame: async () => {
       await hands.send({ image: videoElement });
     },
@@ -4335,7 +4335,7 @@ function setupTask(canvasId, taskFunction) {
     height: 360
   });
 
-  // camera.start();
+  camera.start();
 }
 
 // entrypoint
