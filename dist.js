@@ -4104,18 +4104,27 @@ class HandRenderer {
     this.skeleton = new Skeleton();
 
     // add joints
-    let joints = [];
+    const joints = [];
+
+    // helper
+    const addSeparation = (v0, v1) => {
+      const sep = 0.075; // 7.5%
+      return [
+        v0.add(v1.subtract(v0).multiply(sep)),
+        v1.add(v0.subtract(v1).multiply(sep))
+      ]
+    };
 
     // make arm
-    let shoulder = new Vector$1(-15, 0, 0);
-    let elbow = new Vector$1(-8.4, 0, 0.15);
-    let wrist = new Vector$1(-2, 0, 0.25);
-    let arm1 = new Joint(null, shoulder, elbow.subtract(new Vector$1(0.5, 0, 0)), 'arm1', gl);
-    let arm2 = new Joint(arm1, elbow.add(new Vector$1(0.5, 0, 0)), wrist.subtract(new Vector$1(0.5, 0, 0)), 'arm2', gl);
+    const shoulder = new Vector$1(-15, 0, 0);
+    const elbow = new Vector$1(-8.4, 0, 0.15);
+    const wrist = new Vector$1(-2, 0, 0.25);
+    const arm1 = new Joint(null, ...addSeparation(shoulder, elbow), 'arm1', gl);
+    const arm2 = new Joint(arm1, ...addSeparation(elbow, wrist), 'arm2', gl);
     joints.push(arm1, arm2);
 
-    console.log('arm1 joint endpoints:', arm1.getJointEndPoints());
-    console.log('arm2 joint endpoints:', arm2.getJointEndPoints());
+    // make hand
+    // todo
 
     // pass joints to skeleton
     joints.map(j => this.skeleton.addJoint(j));
