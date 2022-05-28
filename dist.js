@@ -4070,8 +4070,8 @@ class Joint {
 
 // helpers
 const recomputeJointAngleAndAxis = function(joint) {
-  const pv0 = joint.mParent?.mOriginPosition || joint.mOriginPosition.subtract(new Vector$1(1, 0, 0));
-  const pv1 = joint.mParent?.mEndPosition || joint.mOriginPosition;
+  const pv0 = joint.mOriginPosition.subtract(new Vector$1(1, 0, 0));
+  const pv1 = joint.mOriginPosition;
   const v0 = joint.mOriginPosition;
   const v1 = joint.mEndPosition;
 
@@ -4080,7 +4080,7 @@ const recomputeJointAngleAndAxis = function(joint) {
   let b2 = v1.subtract(v0);
 
   let dot = b1.dot(b2);
-  let angle = Math.acos(-dot / (b1.length() * b2.length()));
+  let angle = -Math.acos(-dot / (b1.length() * b2.length()));
 
   let jointAxis = b1.cross(b2).unit();
   // set some default axis if angle is zero
@@ -4093,7 +4093,7 @@ const recomputeJointAngleAndAxis = function(joint) {
 class HandRenderer {
   constructor(gl) {
     // set camera pose
-    this.pitch = 0;
+    this.pitch = 60;
     this.yaw = 0;
 
     // Create a skin mesh
@@ -4107,12 +4107,15 @@ class HandRenderer {
     let joints = [];
 
     // make arm
-    var arm1 = new Joint(null, new Vector$1(-15, 0, 0), new Vector$1(-8.75, 0, 0), 'arm1', gl);
-    var arm2 = new Joint(arm1, new Vector$1(-8, 0, 0), new Vector$1(-3, 0, 0), 'arm2', gl);
+    let shoulder = new Vector$1(-15, 0, 0);
+    let elbow = new Vector$1(-8.4, 0, 0.15);
+    let wrist = new Vector$1(-2, 0, 0.25);
+    let arm1 = new Joint(null, shoulder, elbow.subtract(new Vector$1(0.5, 0, 0)), 'arm1', gl);
+    let arm2 = new Joint(arm1, elbow.add(new Vector$1(0.5, 0, 0)), wrist.subtract(new Vector$1(0.5, 0, 0)), 'arm2', gl);
     joints.push(arm1, arm2);
 
-    console.log('arm1 joint angle: ' + arm1.mJointAngle);
-    console.log('arm2 joint angle: ' + arm2.mJointAngle);
+    console.log('arm1 joint endpoints:', arm1.getJointEndPoints());
+    console.log('arm2 joint endpoints:', arm2.getJointEndPoints());
 
     // pass joints to skeleton
     joints.map(j => this.skeleton.addJoint(j));
@@ -4130,7 +4133,7 @@ class HandRenderer {
     var projection = Matrix.perspective(60, w / h, 0.1, 100);
     var view = Matrix.translate(0, 0, -10).multiply(
       Matrix.rotate(this.pitch, 1, 0, 0)).multiply(
-        Matrix.rotate(80, 0, 1, 0)).multiply(
+        Matrix.rotate(this.yaw, 0, 1, 0)).multiply(
           Matrix.translate(8, 0, 0)).multiply(
             Matrix.rotate(30, 1, 0, 0));
 
@@ -4254,7 +4257,7 @@ function setupTask(canvasId, taskFunction) {
   hands.onResults((results) => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0)
       console.log(results.multiHandLandmarks[0]);
-      // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       // window.requestAnimationFrame(renderLoop);
   });
 

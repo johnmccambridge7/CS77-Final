@@ -114,8 +114,8 @@ export class Joint {
 
 // helpers
 const recomputeJointAngleAndAxis = function(joint) {
-  const pv0 = joint.mParent?.mOriginPosition || joint.mOriginPosition.subtract(new Vector(1, 0, 0));
-  const pv1 = joint.mParent?.mEndPosition || joint.mOriginPosition;
+  const pv0 = joint.mOriginPosition.subtract(new Vector(1, 0, 0));
+  const pv1 = joint.mOriginPosition;
   const v0 = joint.mOriginPosition;
   const v1 = joint.mEndPosition;
 
@@ -124,7 +124,7 @@ const recomputeJointAngleAndAxis = function(joint) {
   let b2 = v1.subtract(v0);
 
   let dot = b1.dot(b2);
-  let angle = Math.acos(-dot / (b1.length() * b2.length()));
+  let angle = -Math.acos(-dot / (b1.length() * b2.length()));
 
   let jointAxis = b1.cross(b2).unit();
   // set some default axis if angle is zero
