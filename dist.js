@@ -4055,7 +4055,7 @@ class Joint {
   computeModelMatrix() {
     var pose = this.getWorldMatrix();
     // Do a scaling about the origin of the cube for the correct size
-    var sMatrix = Matrix.scale(this.mLength, 0.2, 0.2);
+    var sMatrix = Matrix.scale(this.mLength, 0.1, 0.1);
     // And then offset it to coincide with the joint
     var tMatrix = Matrix.translate(this.mLength / 2, 0, 0);
     return pose.multiply(tMatrix.multiply(sMatrix));
@@ -4103,8 +4103,72 @@ class HandRenderer {
     // Create an empty skeleton for now.
     this.skeleton = new Skeleton();
 
-    // add joints
-    const joints = [];
+    // make arm
+    new Vector$1(-15, 0, 0);
+    new Vector$1(-8.4, 0, 0.15);
+    const wrist = new Vector$1(-2, 0, 0.25);
+    // const arm1 = new Joint(null, ...addSeparation(shoulder, elbow), 'arm1', gl);
+    // const arm2 = new Joint(arm1, ...addSeparation(elbow, wrist), 'arm2', gl);
+    // joints.push(arm1, arm2);
+
+    // set initial landmark positions (numbered according to fig 2 of https://google.github.io/mediapipe/solutions/hands.html)
+    const landmarks = {
+      '-2': new Vector$1(-15, 0, 0),
+      '-1': new Vector$1(-8.4, 0, 0.15),
+      '0': wrist,
+      '1': wrist.add(new Vector$1(0.2, 0, -0.8)),
+      '2': wrist.add(new Vector$1(0.6, 0, -0.95)),
+      '3': wrist.add(new Vector$1(0.8, 0, 0.3)),
+      '4': wrist.add(new Vector$1(1.0, 0, 0.375)),
+      5: wrist.add(new Vector$1()),
+      6: wrist.add(new Vector$1()),
+      7: wrist.add(new Vector$1()),
+      8: wrist.add(new Vector$1()),
+      9: wrist.add(new Vector$1()),
+      10: wrist.add(new Vector$1()),
+      11: wrist.add(new Vector$1()),
+      12: wrist.add(new Vector$1()),
+      13: wrist.add(new Vector$1()),
+      14: wrist.add(new Vector$1()),
+      15: wrist.add(new Vector$1()),
+      16: wrist.add(new Vector$1()),
+      17: wrist.add(new Vector$1()),
+      18: wrist.add(new Vector$1()),
+      19: wrist.add(new Vector$1()),
+      20: wrist.add(new Vector$1()),
+    };
+    const joints = [
+      // arm
+      { v0: '-2', v1: '-1', name: 'upper arm' },
+      { v0: '-1', v1: '0',  name: 'lower arm' },
+      // thumb
+      { v0: '0', v1: '1', name: 'thumb 1' },
+      { v0: '1', v1: '2', name: 'thumb 2' },
+      { v0: '2', v1: '3', name: 'thumb 3' },
+      { v0: '3', v1: '4', name: 'thumb 4' },
+      // // palm
+      // { v0: '0',  v1: '5',  name: 'palm 1' },
+      // { v0: '0',  v1: '17', name: 'palm 2' },
+      // { v0: '5',  v1: '9',  name: 'palm 3' },
+      // { v0: '9',  v1: '13', name: 'palm 4' },
+      // { v0: '13', v1: '17', name: 'palm 5' },
+      // // index
+      // { v0: '5', v1: '6', name: 'index 1' },
+      // { v0: '6', v1: '7', name: 'index 2' },
+      // { v0: '7', v1: '8', name: 'index 3' },
+      // // middle
+      // { v0: '9',  v1: '10', name: 'middle 1' },
+      // { v0: '10', v1: '11', name: 'middle 2' },
+      // { v0: '11', v1: '12', name: 'middle 3' },
+      // // ring
+      // { v0: '13', v1: '14', name: 'ring 1' },
+      // { v0: '14', v1: '15', name: 'ring 2' },
+      // { v0: '15', v1: '16', name: 'ring 3' },
+      // // pinky
+      // { v0: '17', v1: '18', name: 'pinky 1' },
+      // { v0: '18', v1: '19', name: 'pinky 2' },
+      // { v0: '19', v1: '20', name: 'pinky 3' }
+    ];
 
     // helper
     const addSeparation = (v0, v1) => {
@@ -4115,19 +4179,17 @@ class HandRenderer {
       ]
     };
 
-    // make arm
-    const shoulder = new Vector$1(-15, 0, 0);
-    const elbow = new Vector$1(-8.4, 0, 0.15);
-    const wrist = new Vector$1(-2, 0, 0.25);
-    const arm1 = new Joint(null, ...addSeparation(shoulder, elbow), 'arm1', gl);
-    const arm2 = new Joint(arm1, ...addSeparation(elbow, wrist), 'arm2', gl);
-    joints.push(arm1, arm2);
-
-    // make hand
-    // todo
-
     // pass joints to skeleton
-    joints.map(j => this.skeleton.addJoint(j));
+    Object.values(joints).map(j => {
+      const v0 = landmarks[j.v0];
+      const v1 = landmarks[j.v1];
+      this.skeleton.addJoint(new Joint(
+        null,
+        ...addSeparation(v0, v1),
+        j.name,
+        gl
+      ));
+    });
 
     // pass skeleton to skin
     this.skin.setSkeleton(this.skeleton, 'linear');
@@ -4266,11 +4328,11 @@ function setupTask(canvasId, taskFunction) {
   hands.onResults((results) => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0)
       console.log(results.multiHandLandmarks[0]);
-      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       // window.requestAnimationFrame(renderLoop);
   });
 
-  const camera = new Camera(videoElement, {
+  new Camera(videoElement, {
     onFrame: async () => {
       await hands.send({ image: videoElement });
     },
@@ -4278,7 +4340,7 @@ function setupTask(canvasId, taskFunction) {
     height: 360
   });
 
-  camera.start();
+  // camera.start();
 }
 
 // entrypoint

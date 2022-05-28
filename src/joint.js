@@ -99,7 +99,7 @@ export class Joint {
   computeModelMatrix() {
     var pose = this.getWorldMatrix();
     // Do a scaling about the origin of the cube for the correct size
-    var sMatrix = Matrix.scale(this.mLength, 0.2, 0.2);
+    var sMatrix = Matrix.scale(this.mLength, 0.1, 0.1);
     // And then offset it to coincide with the joint
     var tMatrix = Matrix.translate(this.mLength / 2, 0, 0);
     return pose.multiply(tMatrix.multiply(sMatrix));
