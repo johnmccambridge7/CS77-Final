@@ -123,7 +123,7 @@ function setupTask(canvasId, taskFunction) {
     canvasCtx.restore();
 
     /* if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-      
+
       canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       window.requestAnimationFrame(renderLoop);
     } else {

@@ -4104,6 +4104,65 @@ const recomputeJointAngleAndAxis = function(joint) {
   joint.mJointAxis = jointAxis;
 };
 
+// set initial landmark positions (numbered according to fig 2 of https://google.github.io/mediapipe/solutions/hands.html)
+const landmarks = {
+  '-2': new Vector$1(-15, 0, 0),
+  '-1': new Vector$1(-8.4, 0, 0.15),
+  '0': wrist,
+  '1': wrist.add(new Vector$1(0, -0.1, -0.75)),
+  '2': wrist.add(new Vector$1(0.8, -0.45, -1.15)),
+  '3': wrist.add(new Vector$1(1.4, -0.7, -1.4)),
+  '4': wrist.add(new Vector$1(1.8, -0.9, -1.55)),
+  5: wrist.add(new Vector$1(1.7, -0.1, -0.85)),
+  6: wrist.add(new Vector$1(2.4, -0.35, -0.95)),
+  7: wrist.add(new Vector$1(2.8, -0.525, -1)),
+  8: wrist.add(new Vector$1(3.1, -0.65, -1.08)),
+  9: wrist.add(new Vector$1(1.8, -0.1, -0.25)),
+  10: wrist.add(new Vector$1(2.6, -0.3, -0.3)),
+  11: wrist.add(new Vector$1(3.1, -0.48, -0.35)),
+  12: wrist.add(new Vector$1(3.5, -0.55, -0.4)),
+  13: wrist.add(new Vector$1(1.75, -0.15, 0.25)),
+  14: wrist.add(new Vector$1(2.4, -0.38, 0.3)),
+  15: wrist.add(new Vector$1(2.85, -0.5, 0.35)),
+  16: wrist.add(new Vector$1(3.18, -0.58, 0.38)),
+  17: wrist.add(new Vector$1(1.55, -0.25, 0.65)),
+  18: wrist.add(new Vector$1(2.1, -0.55, 0.78)),
+  19: wrist.add(new Vector$1(2.35, -0.7, 0.84)),
+  20: wrist.add(new Vector$1(2.68, -0.85, 0.93)),
+};
+const joints = [
+  // arm
+  { v0: '-2', v1: '-1', name: 'upper arm' },
+  { v0: '-1', v1: '0',  name: 'lower arm' },
+  // thumb
+  { v0: '0', v1: '1', name: 'thumb 1' },
+  { v0: '1', v1: '2', name: 'thumb 2' },
+  { v0: '2', v1: '3', name: 'thumb 3' },
+  { v0: '3', v1: '4', name: 'thumb 4' },
+  // palm
+  { v0: '0',  v1: '5',  name: 'palm 1' },
+  { v0: '0',  v1: '17', name: 'palm 2' },
+  { v0: '5',  v1: '9',  name: 'palm 3' },
+  { v0: '9',  v1: '13', name: 'palm 4' },
+  { v0: '13', v1: '17', name: 'palm 5' },
+  // index
+  { v0: '5', v1: '6', name: 'index 1' },
+  { v0: '6', v1: '7', name: 'index 2' },
+  { v0: '7', v1: '8', name: 'index 3' },
+  // middle
+  { v0: '9',  v1: '10', name: 'middle 1' },
+  { v0: '10', v1: '11', name: 'middle 2' },
+  { v0: '11', v1: '12', name: 'middle 3' },
+  // ring
+  { v0: '13', v1: '14', name: 'ring 1' },
+  { v0: '14', v1: '15', name: 'ring 2' },
+  { v0: '15', v1: '16', name: 'ring 3' },
+  // pinky
+  { v0: '17', v1: '18', name: 'pinky 1' },
+  { v0: '18', v1: '19', name: 'pinky 2' },
+  { v0: '19', v1: '20', name: 'pinky 3' }
+];
+
 class HandRenderer {
   constructor(gl) {
     // set camera pose
@@ -4118,66 +4177,7 @@ class HandRenderer {
     this.skeleton = new Skeleton();
 
     // set wrist anchor
-    const wrist = new Vector$1(-2, 0, 0.25);
-
-    // set initial landmark positions (numbered according to fig 2 of https://google.github.io/mediapipe/solutions/hands.html)
-    const landmarks = {
-      '-2': new Vector$1(-15, 0, 0),
-      '-1': new Vector$1(-8.4, 0, 0.15),
-      '0': wrist,
-      '1': wrist.add(new Vector$1(0, -0.1, -0.75)),
-      '2': wrist.add(new Vector$1(0.8, -0.45, -1.15)),
-      '3': wrist.add(new Vector$1(1.4, -0.7, -1.4)),
-      '4': wrist.add(new Vector$1(1.8, -0.9, -1.55)),
-      5: wrist.add(new Vector$1(1.7, -0.1, -0.85)),
-      6: wrist.add(new Vector$1(2.4, -0.35, -0.95)),
-      7: wrist.add(new Vector$1(2.8, -0.525, -1)),
-      8: wrist.add(new Vector$1(3.1, -0.65, -1.08)),
-      9: wrist.add(new Vector$1(1.8, -0.1, -0.25)),
-      10: wrist.add(new Vector$1(2.6, -0.3, -0.3)),
-      11: wrist.add(new Vector$1(3.1, -0.48, -0.35)),
-      12: wrist.add(new Vector$1(3.5, -0.55, -0.4)),
-      13: wrist.add(new Vector$1(1.75, -0.15, 0.25)),
-      14: wrist.add(new Vector$1(2.4, -0.38, 0.3)),
-      15: wrist.add(new Vector$1(2.85, -0.5, 0.35)),
-      16: wrist.add(new Vector$1(3.18, -0.58, 0.38)),
-      17: wrist.add(new Vector$1(1.55, -0.25, 0.65)),
-      18: wrist.add(new Vector$1(2.1, -0.55, 0.78)),
-      19: wrist.add(new Vector$1(2.35, -0.7, 0.84)),
-      20: wrist.add(new Vector$1(2.68, -0.85, 0.93)),
-    };
-    const joints = [
-      // arm
-      { v0: '-2', v1: '-1', name: 'upper arm' },
-      { v0: '-1', v1: '0',  name: 'lower arm' },
-      // thumb
-      { v0: '0', v1: '1', name: 'thumb 1' },
-      { v0: '1', v1: '2', name: 'thumb 2' },
-      { v0: '2', v1: '3', name: 'thumb 3' },
-      { v0: '3', v1: '4', name: 'thumb 4' },
-      // palm
-      { v0: '0',  v1: '5',  name: 'palm 1' },
-      { v0: '0',  v1: '17', name: 'palm 2' },
-      { v0: '5',  v1: '9',  name: 'palm 3' },
-      { v0: '9',  v1: '13', name: 'palm 4' },
-      { v0: '13', v1: '17', name: 'palm 5' },
-      // index
-      { v0: '5', v1: '6', name: 'index 1' },
-      { v0: '6', v1: '7', name: 'index 2' },
-      { v0: '7', v1: '8', name: 'index 3' },
-      // middle
-      { v0: '9',  v1: '10', name: 'middle 1' },
-      { v0: '10', v1: '11', name: 'middle 2' },
-      { v0: '11', v1: '12', name: 'middle 3' },
-      // ring
-      { v0: '13', v1: '14', name: 'ring 1' },
-      { v0: '14', v1: '15', name: 'ring 2' },
-      { v0: '15', v1: '16', name: 'ring 3' },
-      // pinky
-      { v0: '17', v1: '18', name: 'pinky 1' },
-      { v0: '18', v1: '19', name: 'pinky 2' },
-      { v0: '19', v1: '20', name: 'pinky 3' }
-    ];
+    new Vector$1(-2, 0, 0.25);
 
     // helper
     const addSeparation = (v0, v1) => {
@@ -4247,7 +4247,7 @@ class HandRenderer {
       if (positions.length > 0) {
         var unformatted = positions[0];
         var position = {x: unformatted.x - 0.5, y: unformatted.y - 0.5, z: unformatted.z - 0.5};
-      
+
         // -0.5 offsets the wrist to the center of screen
 
         // x: right
@@ -4257,8 +4257,29 @@ class HandRenderer {
 
         // left to right from mediapipe, goes up and down (x, y)
 
+        // for each position, update all joints that use the landmark
+        positions.forEach((position, idx) => {
+          // find all joints that use this
+          const { v0s, v1s } = joints.reduce((acc, j, id) => {
+            if (j.v0 === idx.toString()) acc.v0s.push(id);
+            if (j.v1 === idx.toString()) acc.v1s.push(id);
+            return acc;
+          }, { v0s: [], v1s: [] });
+
+          v0s.forEach(id => {
+            // update joint origin
+            // todo
+            // this.skeleton.getJoint(id).setOrigin()
+          });
+          v1s.forEach(id => {
+            // update joint end
+            // todo
+            // this.skeleton.getJoint(id).setEnd()
+          });
+        });
+
         // get the joint
-        var joint = this.skeleton.getJoint(1); // corresponds to thumb one
+        var joint = this.skeleton.getJoint(1); // corresponds to lower arm
         // set the position
 
         var xRot = Matrix.rotate(180, 1, 0, 0);
@@ -4407,7 +4428,7 @@ function setupTask(canvasId, taskFunction) {
     canvasCtx.restore();
 
     /* if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-      
+
       canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       window.requestAnimationFrame(renderLoop);
     } else {
