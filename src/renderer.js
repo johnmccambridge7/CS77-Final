@@ -106,7 +106,23 @@ export class HandRenderer {
     gl.enable(gl.DEPTH_TEST);
   }
 
-  render(gl, w, h) {
+  /* 
+  1  0  0  0 | 1
+  0  1  0  0 | 1
+  0  0  1  0 | 1
+  0  0  0  1 | 1
+
+
+  */  
+  transformVector(m, v) {
+    return new Vector(
+      m[0] * v.x + m[1] * v.y + m[2] * v.z,
+      m[4] * v.x + m[5] * v.y + m[6] * v.z,
+      m[8] * v.x + m[9] * v.y + m[10] * v.z
+    );
+  }
+
+  render(gl, w, h, positions) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -123,6 +139,39 @@ export class HandRenderer {
 
     if (this.skeleton) {
       gl.clear(gl.DEPTH_BUFFER_BIT);
+
+      // loop over every position in the new hand positions
+      // for (var i = 2; i < positions.length; i++) {
+        // get the position
+
+      if (positions.length > 0) {
+        var unformatted = positions[0];
+        var position = {x: unformatted.x - 0.5, y: unformatted.y - 0.5, z: unformatted.z - 0.5};
+      
+        // -0.5 offsets the wrist to the center of screen
+
+        // x: right
+        // y: up
+        // z: towards camera
+        // console.log(position);
+
+        // left to right from mediapipe, goes up and down (x, y)
+
+        // get the joint
+        var joint = this.skeleton.getJoint(1); // corresponds to thumb one
+        // set the position
+
+        var xRot = Matrix.rotate(180, 1, 0, 0);
+        var yRot = Matrix.rotate(-270, 0, 1, 0);
+
+        var wristVector = new Vector(4.0*position.x, 4.0*position.y, 4.0*position.z);
+        var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
+        var f = this.transformVector(yRot.m, rotWristVector);
+        // console.log(wristVector, rotWristVector);
+        joint.setJointEnd(new Vector(f.x, f.y, f.z));
+      }
+      // }
+
       this.skeleton.render(gl, view, projection);
     }
   }

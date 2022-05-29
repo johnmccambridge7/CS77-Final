@@ -61,6 +61,8 @@ function setupTask(canvasId, taskFunction) {
 
   var mouseDown = false;
   var lastMouseX, lastMouseY;
+  var positions = [];
+
   var mouseMoveListener = function(event) {
     task.dragCamera(event.screenX - lastMouseX, event.screenY - lastMouseY);
     lastMouseX = event.screenX;
@@ -93,17 +95,40 @@ function setupTask(canvasId, taskFunction) {
   canvas.parentNode.appendChild(uiContainer);
 
   renderLoop = function() {
-    task.render(gl, renderWidth, renderHeight);
+    task.render(gl, renderWidth, renderHeight, positions);
     setTimeout(() => window.requestAnimationFrame(renderLoop), 1000 / 60)
   }
 
   window.requestAnimationFrame(renderLoop);
 
   hands.onResults((results) => {
-    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0)
-      console.log(results.multiHandLandmarks[0]);
-      // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-      // window.requestAnimationFrame(renderLoop);
+
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(
+        results.image, 0, 0, canvasElement.width, canvasElement.height);
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      positions = results.multiHandLandmarks[0];
+
+      /* for (const landmarks of results.multiHandLandmarks) {
+        drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
+                      {color: '#00FF00', lineWidth: 5});
+      } */
+      drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
+
+    } else {
+      positions = [];
+    }
+
+    canvasCtx.restore();
+
+    /* if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      window.requestAnimationFrame(renderLoop);
+    } else {
+      positions = [];
+    }*/
   });
 
   const camera = new Camera(videoElement, {
@@ -114,7 +139,7 @@ function setupTask(canvasId, taskFunction) {
     height: 360
   });
 
-  // camera.start();
+  camera.start();
 }
 
 // entrypoint
