@@ -7,7 +7,7 @@ import { Vector } from './vector';
 export class HandRenderer {
   constructor(gl) {
     // set camera pose
-    this.pitch = 60;
+    this.pitch = 0;
     this.yaw = 0;
 
     // Create a skin mesh
@@ -25,26 +25,26 @@ export class HandRenderer {
       '-2': new Vector(-15, 0, 0),
       '-1': new Vector(-8.4, 0, 0.15),
       '0': wrist,
-      '1': wrist.add(new Vector(0, 0, -0.75)),
-      '2': wrist.add(new Vector(0.8, 0, -1.15)),
-      '3': wrist.add(new Vector(1.4, 0, -1.3)),
-      '4': wrist.add(new Vector(1.8, 0, -1.45)),
-      5: wrist.add(new Vector(1.7, 0, -0.85)),
-      6: wrist.add(new Vector(2.4, 0, -0.95)),
-      7: wrist.add(new Vector(2.8, 0, -1)),
-      8: wrist.add(new Vector(3.1, 0, -1.08)),
-      9: wrist.add(new Vector(1.8, 0, -0.25)),
-      10: wrist.add(new Vector(2.6, 0, -0.3)),
-      11: wrist.add(new Vector(3.1, 0, -0.35)),
-      12: wrist.add(new Vector(3.5, 0, -0.4)),
-      13: wrist.add(new Vector(1.75, 0, 0.25)),
-      14: wrist.add(new Vector(2.4, 0, 0.3)),
-      15: wrist.add(new Vector(2.85, 0, 0.35)),
-      16: wrist.add(new Vector(3.18, 0, 0.38)),
-      17: wrist.add(new Vector(1.55, 0, 0.65)),
-      18: wrist.add(new Vector(2.1, 0, 0.7)),
-      19: wrist.add(new Vector(2.35, 0, 0.75)),
-      20: wrist.add(new Vector(2.62, 0, 0.85)),
+      '1': wrist.add(new Vector(0, -0.1, -0.75)),
+      '2': wrist.add(new Vector(0.8, -0.45, -1.15)),
+      '3': wrist.add(new Vector(1.4, -0.7, -1.4)),
+      '4': wrist.add(new Vector(1.8, -0.9, -1.55)),
+      5: wrist.add(new Vector(1.7, -0.1, -0.85)),
+      6: wrist.add(new Vector(2.4, -0.35, -0.95)),
+      7: wrist.add(new Vector(2.8, -0.525, -1)),
+      8: wrist.add(new Vector(3.1, -0.65, -1.08)),
+      9: wrist.add(new Vector(1.8, -0.1, -0.25)),
+      10: wrist.add(new Vector(2.6, -0.3, -0.3)),
+      11: wrist.add(new Vector(3.1, -0.48, -0.35)),
+      12: wrist.add(new Vector(3.5, -0.55, -0.4)),
+      13: wrist.add(new Vector(1.75, -0.15, 0.25)),
+      14: wrist.add(new Vector(2.4, -0.38, 0.3)),
+      15: wrist.add(new Vector(2.85, -0.5, 0.35)),
+      16: wrist.add(new Vector(3.18, -0.58, 0.38)),
+      17: wrist.add(new Vector(1.55, -0.25, 0.65)),
+      18: wrist.add(new Vector(2.1, -0.55, 0.78)),
+      19: wrist.add(new Vector(2.35, -0.7, 0.84)),
+      20: wrist.add(new Vector(2.68, -0.85, 0.93)),
     };
     const joints = [
       // arm
@@ -111,7 +111,7 @@ export class HandRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var projection = Matrix.perspective(60, w / h, 0.1, 100);
-    var view = Matrix.translate(-8, 0, -10).multiply(
+    var view = Matrix.translate(-8, 0, -5).multiply(
       Matrix.rotate(this.pitch, 1, 0, 0)).multiply(
         Matrix.rotate(this.yaw, 0, 1, 0)).multiply(
           Matrix.translate(8, 0, 0)).multiply(

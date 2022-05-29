@@ -1,11 +1,12 @@
 import '@mediapipe/hands';
 import '@mediapipe/camera_utils';
+import '@mediapipe/drawing_utils';
 
 import { ButtonGroup, div } from './uiUtil';
 import { HandRenderer } from './renderer';
 
 // why does mediapipe mount this here? no idea
-const { Hands, Camera } = window;
+const { Hands, Camera, drawLandmarks } = window;
 
 const hands = new Hands({
   locateFile: (file) => {
@@ -101,7 +102,7 @@ function setupTask(canvasId, taskFunction) {
   hands.onResults((results) => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0)
       console.log(results.multiHandLandmarks[0]);
-      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       // window.requestAnimationFrame(renderLoop);
   });
 
@@ -113,7 +114,7 @@ function setupTask(canvasId, taskFunction) {
     height: 360
   });
 
-  camera.start();
+  // camera.start();
 }
 
 // entrypoint
