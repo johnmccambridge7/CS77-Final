@@ -4104,6 +4104,9 @@ const recomputeJointAngleAndAxis = function(joint) {
   joint.mJointAxis = jointAxis;
 };
 
+// set wrist anchor
+const wrist = new Vector$1(-2, 0, 0.25);
+
 // set initial landmark positions (numbered according to fig 2 of https://google.github.io/mediapipe/solutions/hands.html)
 const landmarks = {
   '-2': new Vector$1(-15, 0, 0),
@@ -4176,9 +4179,6 @@ class HandRenderer {
     // Create an empty skeleton for now.
     this.skeleton = new Skeleton();
 
-    // set wrist anchor
-    new Vector$1(-2, 0, 0.25);
-
     // helper
     const addSeparation = (v0, v1) => {
       const sep = 0.075; // 7.5%
@@ -4245,17 +4245,22 @@ class HandRenderer {
         // get the position
 
       if (positions.length > 0) {
-        var unformatted = positions[0];
-        var position = {x: unformatted.x - 0.5, y: unformatted.y - 0.5, z: unformatted.z - 0.5};
-
-        // -0.5 offsets the wrist to the center of screen
-
         // x: right
         // y: up
         // z: towards camera
-        // console.log(position);
 
         // left to right from mediapipe, goes up and down (x, y)
+
+        // transform from mediapipe to world space
+        const transformPos = (pos) => {
+          var xRot = Matrix.rotate(180, 1, 0, 0);
+          var yRot = Matrix.rotate(-270, 0, 1, 0);
+
+          // -0.5 offsets the wrist to the center of screen
+          var wristVector = new Vector$1(4.0*(pos.x - 0.5), 4.0*(pos.y - 0.5), 4.0*(pos.z - 0.5));
+          var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
+          return this.transformVector(yRot.m, rotWristVector);
+        };
 
         // for each position, update all joints that use the landmark
         positions.forEach((position, idx) => {
@@ -4266,43 +4271,30 @@ class HandRenderer {
             return acc;
           }, { v0s: [], v1s: [] });
 
+          // get new pos in world space
+          const pos = transformPos(position);
+
           v0s.forEach(id => {
             // update joint origin
-            // todo
-            // this.skeleton.getJoint(id).setOrigin()
+            this.skeleton.getJoint(id).setJointOrigin(pos);
           });
           v1s.forEach(id => {
             // update joint end
-            // todo
-            // this.skeleton.getJoint(id).setEnd()
+            this.skeleton.getJoint(id).setJointEnd(pos);
           });
         });
-
-        // get the joint
-        var joint = this.skeleton.getJoint(1); // corresponds to lower arm
-        // set the position
-
-        var xRot = Matrix.rotate(180, 1, 0, 0);
-        var yRot = Matrix.rotate(-270, 0, 1, 0);
-
-        var wristVector = new Vector$1(4.0*position.x, 4.0*position.y, 4.0*position.z);
-        var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
-        var f = this.transformVector(yRot.m, rotWristVector);
-        // console.log(wristVector, rotWristVector);
-        joint.setJointEnd(new Vector$1(f.x, f.y, f.z));
       }
-      // }
 
       this.skeleton.render(gl, view, projection);
     }
   }
 
-  setJointEndpoints(id, v0, v1) {
-    if (this.skeleton && id < this.skeleton.getNumJoints()) {
-      this.skeleton.getJoint(id).setJointEndpoints(v0, v1);
-      this.skin.updateSkin();
-    }
-  }
+  // setJointEndpoints(id, v0, v1) {
+  //   if (this.skeleton && id < this.skeleton.getNumJoints()) {
+  //     this.skeleton.getJoint(id).setJointEndpoints(v0, v1);
+  //     this.skin.updateSkin();
+  //   }
+  // }
 
   dragCamera(dx, dy) {
     this.pitch = Math.min(Math.max(this.pitch + dy * 0.5, -180), 180);
