@@ -7,8 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
-    "dev": "yarn build && open index.html && yarn build -- -w",
-    "start": "yarn build && open index.html"
+    "dev": "yarn build && http-server . -o & yarn build -- -w",
+    "start": "yarn build && http-server . -o"
   },
   "dependencies": {
     "@mediapipe/camera_utils": "^0.3.1640029074",
@@ -20,6 +20,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
+    "http-server": "^14.1.0",
     "rollup": "^2.74.1"
   }
 }
