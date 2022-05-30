@@ -4211,9 +4211,8 @@ class HandRenderer {
   0  1  0  0 | 1
   0  0  1  0 | 1
   0  0  0  1 | 1
-
-
   */  
+
   transformVector(m, v) {
     return new Vector$1(
       m[0] * v.x + m[1] * v.y + m[2] * v.z,
@@ -4253,13 +4252,18 @@ class HandRenderer {
 
         // transform from mediapipe to world space
         const transformPos = (pos) => {
-          var xRot = Matrix.rotate(180, 1, 0, 0);
+          var xRot = Matrix.rotate(270, 1, 0, 0);
           var yRot = Matrix.rotate(-270, 0, 1, 0);
 
+          // -2, 0, 0.25
           // -0.5 offsets the wrist to the center of screen
-          var wristVector = new Vector$1(4.0*(pos.x - 0.5), 4.0*(pos.y - 0.5), 4.0*(pos.z - 0.5));
+          // more negative x, moves the hand to the right
+          var wristVector =  new Vector$1(4.0*(pos.x) - 2.0, 4.0*(pos.y), 4.0*(pos.z)); // new Vector(4.0*(pos.x) + 0.5, 4.0*(pos.y) - 2.0, 4.0*(pos.z));
           var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
-          return this.transformVector(yRot.m, rotWristVector);
+          var yRotWrist = this.transformVector(yRot.m, rotWristVector);
+          // var finalWrist = this.transformVector(zRot.m, yRotWrist);
+
+          return yRotWrist;
         };
 
         // for each position, update all joints that use the landmark
