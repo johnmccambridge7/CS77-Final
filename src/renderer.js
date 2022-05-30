@@ -190,6 +190,7 @@ export class HandRenderer {
       }
 
       this.skeleton.render(gl, view, projection);
+      this.skin.updateSkin();
     }
   }
 

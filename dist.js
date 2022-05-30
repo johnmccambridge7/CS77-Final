@@ -226,7 +226,7 @@ class ButtonGroup {
 // Provides a simple 3D vector class. Vector operations can be done using member
 // functions, which return new vectors, or static functions, which reuse
 // existing vectors to avoid generating garbage.
-class Vector$1 {
+class Vector {
   constructor(x, y, z) {
     this.x = x || 0;
     this.y = y || 0;
@@ -234,35 +234,35 @@ class Vector$1 {
   }
 
   negative() {
-    return new Vector$1(-this.x, -this.y, -this.z);
+    return new Vector(-this.x, -this.y, -this.z);
   }
 
   add(v) {
-    if (v instanceof Vector$1)
-      return new Vector$1(this.x + v.x, this.y + v.y, this.z + v.z);
+    if (v instanceof Vector)
+      return new Vector(this.x + v.x, this.y + v.y, this.z + v.z);
     else
-      return new Vector$1(this.x + v, this.y + v, this.z + v);
+      return new Vector(this.x + v, this.y + v, this.z + v);
   }
 
   subtract(v) {
-    if (v instanceof Vector$1)
-      return new Vector$1(this.x - v.x, this.y - v.y, this.z - v.z);
+    if (v instanceof Vector)
+      return new Vector(this.x - v.x, this.y - v.y, this.z - v.z);
     else
-      return new Vector$1(this.x - v, this.y - v, this.z - v);
+      return new Vector(this.x - v, this.y - v, this.z - v);
   }
 
   multiply(v) {
-    if (v instanceof Vector$1)
-      return new Vector$1(this.x * v.x, this.y * v.y, this.z * v.z);
+    if (v instanceof Vector)
+      return new Vector(this.x * v.x, this.y * v.y, this.z * v.z);
     else
-      return new Vector$1(this.x * v, this.y * v, this.z * v);
+      return new Vector(this.x * v, this.y * v, this.z * v);
   }
 
   divide(v) {
-    if (v instanceof Vector$1)
-      return new Vector$1(this.x / v.x, this.y / v.y, this.z / v.z);
+    if (v instanceof Vector)
+      return new Vector(this.x / v.x, this.y / v.y, this.z / v.z);
     else
-      return new Vector$1(this.x / v, this.y / v, this.z / v);
+      return new Vector(this.x / v, this.y / v, this.z / v);
   }
 
   equals(v) {
@@ -274,7 +274,7 @@ class Vector$1 {
   }
 
   cross(v) {
-    return new Vector$1(
+    return new Vector(
       this.y * v.z - this.z * v.y,
       this.z * v.x - this.x * v.z,
       this.x * v.y - this.y * v.x
@@ -313,7 +313,7 @@ class Vector$1 {
   }
 
   clone() {
-    return new Vector$1(this.x, this.y, this.z);
+    return new Vector(this.x, this.y, this.z);
   }
 
   init(x, y, z) {
@@ -330,25 +330,25 @@ class Vector$1 {
   }
 
   static add(a, b, c) {
-    if (b instanceof Vector$1) { c.x = a.x + b.x; c.y = a.y + b.y; c.z = a.z + b.z; }
+    if (b instanceof Vector) { c.x = a.x + b.x; c.y = a.y + b.y; c.z = a.z + b.z; }
     else { c.x = a.x + b; c.y = a.y + b; c.z = a.z + b; }
     return c;
   }
 
   static subtract(a, b, c) {
-    if (b instanceof Vector$1) { c.x = a.x - b.x; c.y = a.y - b.y; c.z = a.z - b.z; }
+    if (b instanceof Vector) { c.x = a.x - b.x; c.y = a.y - b.y; c.z = a.z - b.z; }
     else { c.x = a.x - b; c.y = a.y - b; c.z = a.z - b; }
     return c;
   }
 
   static multiply(a, b, c) {
-    if (b instanceof Vector$1) { c.x = a.x * b.x; c.y = a.y * b.y; c.z = a.z * b.z; }
+    if (b instanceof Vector) { c.x = a.x * b.x; c.y = a.y * b.y; c.z = a.z * b.z; }
     else { c.x = a.x * b; c.y = a.y * b; c.z = a.z * b; }
     return c;
   }
 
   static divide(a, b, c) {
-    if (b instanceof Vector$1) { c.x = a.x / b.x; c.y = a.y / b.y; c.z = a.z / b.z; }
+    if (b instanceof Vector) { c.x = a.x / b.x; c.y = a.y / b.y; c.z = a.z / b.z; }
     else { c.x = a.x / b; c.y = a.y / b; c.z = a.z / b; }
     return c;
   }
@@ -369,19 +369,19 @@ class Vector$1 {
   }
 
   static fromAngles(theta, phi) {
-    return new Vector$1(Math.cos(theta) * Math.cos(phi), Math.sin(phi), Math.sin(theta) * Math.cos(phi));
+    return new Vector(Math.cos(theta) * Math.cos(phi), Math.sin(phi), Math.sin(theta) * Math.cos(phi));
   }
 
   static randomDirection() {
-    return Vector$1.fromAngles(Math.random() * Math.PI * 2, Math.asin(Math.random() * 2 - 1));
+    return Vector.fromAngles(Math.random() * Math.PI * 2, Math.asin(Math.random() * 2 - 1));
   }
 
   static min(a, b) {
-    return new Vector$1(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.min(a.z, b.z));
+    return new Vector(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.min(a.z, b.z));
   }
 
   static max(a, b) {
-    return new Vector$1(Math.max(a.x, b.x), Math.max(a.y, b.y), Math.max(a.z, b.z));
+    return new Vector(Math.max(a.x, b.x), Math.max(a.y, b.y), Math.max(a.z, b.z));
   }
 
   static lerp(a, b, fraction) {
@@ -389,7 +389,7 @@ class Vector$1 {
   }
 
   static fromArray(a) {
-    return new Vector$1(a[0], a[1], a[2]);
+    return new Vector(a[0], a[1], a[2]);
   }
 
   static angleBetween(a, b) {
@@ -421,11 +421,6 @@ class Vector$1 {
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 */
-
-// Represents a 4x4 matrix stored in row-major order that uses Float32Arrays
-// when available. Matrix operations can either be done using convenient
-// methods that return a new matrix for the result or optimized methods
-// that store the result in an existing matrix to avoid generating garbage.
 
 var hasFloat32Array = (typeof Float32Array != 'undefined');
 
@@ -869,8 +864,8 @@ class TriangleMesh {
   constructor(gl, vertexPositions, indices, shaderProgram, drawFaces, drawEdges, faceColor, edgeColor) {
     this.drawFaces = defaultArg(drawFaces, true);
     this.drawEdges = defaultArg(drawEdges, true);
-    this.faceColor = defaultArg(faceColor, new Vector$1(1, 1, 1));
-    this.edgeColor = defaultArg(edgeColor, new Vector$1(0.5, 0.5, 0.5));
+    this.faceColor = defaultArg(faceColor, new Vector(1, 1, 1));
+    this.edgeColor = defaultArg(edgeColor, new Vector(0.5, 0.5, 0.5));
 
     this.positionVbo = createVertexBuffer(gl, vertexPositions);
     if (this.drawFaces) {
@@ -3560,8 +3555,8 @@ var armIndices = [
 ];
 
 function computeDistanceToLine(pt, vertex0, vertex1) {
-	var v0 = new Vector$1(vertex0.x, vertex0.y, vertex0.z);
-	var v1 = new Vector$1(vertex1.x, vertex1.y, vertex1.z);
+	var v0 = new Vector(vertex0.x, vertex0.y, vertex0.z);
+	var v1 = new Vector(vertex1.x, vertex1.y, vertex1.z);
 
 	var resultant = v1.subtract(v0);
 	var normalVector = resultant.unit();
@@ -3641,7 +3636,7 @@ class SkinMesh {
 
 	// Helper method to get a vertex with 'id'
 	getVertex(idx) {
-		return new Vector$1(this.mOriginalPositions[idx * 3 + 0], this.mOriginalPositions[idx * 3 + 1], this.mOriginalPositions[idx * 3 + 2]);
+		return new Vector(this.mOriginalPositions[idx * 3 + 0], this.mOriginalPositions[idx * 3 + 1], this.mOriginalPositions[idx * 3 + 2]);
 	}
 
 	// Helper method to set a transformed vertex into the correct location.
@@ -3718,7 +3713,7 @@ class SkinMesh {
 	// Implement linear blended skinning
 	linearBlendSkinning() {
 		for (var i = 0; i < this.getNumVertices(); i++) {
-			var transformedPos = new Vector$1();
+			var transformedPos = new Vector();
 			for (var j = 0; j < this.mSkeleton.getNumJoints(); j++) {
 				var weight = this.getVertexWeight(i, j);
 				var joint = this.mSkeleton.getJoint(j);
@@ -4001,8 +3996,8 @@ class Joint {
       shader,
       true,
       true,
-      new Vector$1(0.4, 0.7, 0.4),
-      new Vector$1(0.5, 1, 0.5)
+      new Vector(0.4, 0.7, 0.4),
+      new Vector(0.5, 1, 0.5)
     );
 
     this.mJointAngle = null;
@@ -4084,7 +4079,7 @@ class Joint {
 
 // helpers
 const recomputeJointAngleAndAxis = function(joint) {
-  const pv0 = joint.mOriginPosition.subtract(new Vector$1(1, 0, 0));
+  const pv0 = joint.mOriginPosition.subtract(new Vector(1, 0, 0));
   const pv1 = joint.mOriginPosition;
   const v0 = joint.mOriginPosition;
   const v1 = joint.mEndPosition;
@@ -4105,33 +4100,33 @@ const recomputeJointAngleAndAxis = function(joint) {
 };
 
 // set wrist anchor
-const wrist = new Vector$1(-2, 0, 0.25);
+const wrist = new Vector(-2, 0, 0.25);
 
 // set initial landmark positions (numbered according to fig 2 of https://google.github.io/mediapipe/solutions/hands.html)
 const landmarks = {
-  '-2': new Vector$1(-15, 0, 0),
-  '-1': new Vector$1(-8.4, 0, 0.15),
+  '-2': new Vector(-15, 0, 0),
+  '-1': new Vector(-8.4, 0, 0.15),
   '0': wrist,
-  '1': wrist.add(new Vector$1(0, -0.1, -0.75)),
-  '2': wrist.add(new Vector$1(0.8, -0.45, -1.15)),
-  '3': wrist.add(new Vector$1(1.4, -0.7, -1.4)),
-  '4': wrist.add(new Vector$1(1.8, -0.9, -1.55)),
-  5: wrist.add(new Vector$1(1.7, -0.1, -0.85)),
-  6: wrist.add(new Vector$1(2.4, -0.35, -0.95)),
-  7: wrist.add(new Vector$1(2.8, -0.525, -1)),
-  8: wrist.add(new Vector$1(3.1, -0.65, -1.08)),
-  9: wrist.add(new Vector$1(1.8, -0.1, -0.25)),
-  10: wrist.add(new Vector$1(2.6, -0.3, -0.3)),
-  11: wrist.add(new Vector$1(3.1, -0.48, -0.35)),
-  12: wrist.add(new Vector$1(3.5, -0.55, -0.4)),
-  13: wrist.add(new Vector$1(1.75, -0.15, 0.25)),
-  14: wrist.add(new Vector$1(2.4, -0.38, 0.3)),
-  15: wrist.add(new Vector$1(2.85, -0.5, 0.35)),
-  16: wrist.add(new Vector$1(3.18, -0.58, 0.38)),
-  17: wrist.add(new Vector$1(1.55, -0.25, 0.65)),
-  18: wrist.add(new Vector$1(2.1, -0.55, 0.78)),
-  19: wrist.add(new Vector$1(2.35, -0.7, 0.84)),
-  20: wrist.add(new Vector$1(2.68, -0.85, 0.93)),
+  '1': wrist.add(new Vector(0, -0.1, -0.75)),
+  '2': wrist.add(new Vector(0.8, -0.45, -1.15)),
+  '3': wrist.add(new Vector(1.4, -0.7, -1.4)),
+  '4': wrist.add(new Vector(1.8, -0.9, -1.55)),
+  5: wrist.add(new Vector(1.7, -0.1, -0.85)),
+  6: wrist.add(new Vector(2.4, -0.35, -0.95)),
+  7: wrist.add(new Vector(2.8, -0.525, -1)),
+  8: wrist.add(new Vector(3.1, -0.65, -1.08)),
+  9: wrist.add(new Vector(1.8, -0.1, -0.25)),
+  10: wrist.add(new Vector(2.6, -0.3, -0.3)),
+  11: wrist.add(new Vector(3.1, -0.48, -0.35)),
+  12: wrist.add(new Vector(3.5, -0.55, -0.4)),
+  13: wrist.add(new Vector(1.75, -0.15, 0.25)),
+  14: wrist.add(new Vector(2.4, -0.38, 0.3)),
+  15: wrist.add(new Vector(2.85, -0.5, 0.35)),
+  16: wrist.add(new Vector(3.18, -0.58, 0.38)),
+  17: wrist.add(new Vector(1.55, -0.25, 0.65)),
+  18: wrist.add(new Vector(2.1, -0.55, 0.78)),
+  19: wrist.add(new Vector(2.35, -0.7, 0.84)),
+  20: wrist.add(new Vector(2.68, -0.85, 0.93)),
 };
 const joints = [
   // arm
@@ -4214,7 +4209,7 @@ class HandRenderer {
   */  
 
   transformVector(m, v) {
-    return new Vector$1(
+    return new Vector(
       m[0] * v.x + m[1] * v.y + m[2] * v.z,
       m[4] * v.x + m[5] * v.y + m[6] * v.z,
       m[8] * v.x + m[9] * v.y + m[10] * v.z
@@ -4258,7 +4253,7 @@ class HandRenderer {
           // -2, 0, 0.25
           // -0.5 offsets the wrist to the center of screen
           // more negative x, moves the hand to the right
-          var wristVector =  new Vector$1(4.0*(pos.x) - 2.0, 4.0*(pos.y), 4.0*(pos.z)); // new Vector(4.0*(pos.x) + 0.5, 4.0*(pos.y) - 2.0, 4.0*(pos.z));
+          var wristVector =  new Vector(4.0*(pos.x) - 2.0, 4.0*(pos.y), 4.0*(pos.z)); // new Vector(4.0*(pos.x) + 0.5, 4.0*(pos.y) - 2.0, 4.0*(pos.z));
           var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
           var yRotWrist = this.transformVector(yRot.m, rotWristVector);
           // var finalWrist = this.transformVector(zRot.m, yRotWrist);
@@ -4290,6 +4285,7 @@ class HandRenderer {
       }
 
       this.skeleton.render(gl, view, projection);
+      this.skin.updateSkin();
     }
   }
 
@@ -4415,7 +4411,7 @@ function setupTask(canvasId, taskFunction) {
         drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
                       {color: '#00FF00', lineWidth: 5});
       } */
-      drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
+      // drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
 
     } else {
       positions = [];
@@ -4436,8 +4432,8 @@ function setupTask(canvasId, taskFunction) {
     onFrame: async () => {
       await hands.send({ image: videoElement });
     },
-    width: 480,
-    height: 360
+    width: 662,
+    height: 372
   });
 
   camera.start();

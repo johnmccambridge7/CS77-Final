@@ -28,6 +28,8 @@
 // methods that return a new matrix for the result or optimized methods
 // that store the result in an existing matrix to avoid generating garbage.
 
+import { Vector } from './vector';
+
 var hasFloat32Array = (typeof Float32Array != 'undefined');
 
 // ### new GL.Matrix([elements])
