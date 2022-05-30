@@ -4104,6 +4104,68 @@ const recomputeJointAngleAndAxis = function(joint) {
   joint.mJointAxis = jointAxis;
 };
 
+// set wrist anchor
+const wrist = new Vector$1(-2, 0, 0.25);
+
+// set initial landmark positions (numbered according to fig 2 of https://google.github.io/mediapipe/solutions/hands.html)
+const landmarks = {
+  '-2': new Vector$1(-15, 0, 0),
+  '-1': new Vector$1(-8.4, 0, 0.15),
+  '0': wrist,
+  '1': wrist.add(new Vector$1(0, -0.1, -0.75)),
+  '2': wrist.add(new Vector$1(0.8, -0.45, -1.15)),
+  '3': wrist.add(new Vector$1(1.4, -0.7, -1.4)),
+  '4': wrist.add(new Vector$1(1.8, -0.9, -1.55)),
+  5: wrist.add(new Vector$1(1.7, -0.1, -0.85)),
+  6: wrist.add(new Vector$1(2.4, -0.35, -0.95)),
+  7: wrist.add(new Vector$1(2.8, -0.525, -1)),
+  8: wrist.add(new Vector$1(3.1, -0.65, -1.08)),
+  9: wrist.add(new Vector$1(1.8, -0.1, -0.25)),
+  10: wrist.add(new Vector$1(2.6, -0.3, -0.3)),
+  11: wrist.add(new Vector$1(3.1, -0.48, -0.35)),
+  12: wrist.add(new Vector$1(3.5, -0.55, -0.4)),
+  13: wrist.add(new Vector$1(1.75, -0.15, 0.25)),
+  14: wrist.add(new Vector$1(2.4, -0.38, 0.3)),
+  15: wrist.add(new Vector$1(2.85, -0.5, 0.35)),
+  16: wrist.add(new Vector$1(3.18, -0.58, 0.38)),
+  17: wrist.add(new Vector$1(1.55, -0.25, 0.65)),
+  18: wrist.add(new Vector$1(2.1, -0.55, 0.78)),
+  19: wrist.add(new Vector$1(2.35, -0.7, 0.84)),
+  20: wrist.add(new Vector$1(2.68, -0.85, 0.93)),
+};
+const joints = [
+  // arm
+  { v0: '-2', v1: '-1', name: 'upper arm' },
+  { v0: '-1', v1: '0',  name: 'lower arm' },
+  // thumb
+  { v0: '0', v1: '1', name: 'thumb 1' },
+  { v0: '1', v1: '2', name: 'thumb 2' },
+  { v0: '2', v1: '3', name: 'thumb 3' },
+  { v0: '3', v1: '4', name: 'thumb 4' },
+  // palm
+  { v0: '0',  v1: '5',  name: 'palm 1' },
+  { v0: '0',  v1: '17', name: 'palm 2' },
+  { v0: '5',  v1: '9',  name: 'palm 3' },
+  { v0: '9',  v1: '13', name: 'palm 4' },
+  { v0: '13', v1: '17', name: 'palm 5' },
+  // index
+  { v0: '5', v1: '6', name: 'index 1' },
+  { v0: '6', v1: '7', name: 'index 2' },
+  { v0: '7', v1: '8', name: 'index 3' },
+  // middle
+  { v0: '9',  v1: '10', name: 'middle 1' },
+  { v0: '10', v1: '11', name: 'middle 2' },
+  { v0: '11', v1: '12', name: 'middle 3' },
+  // ring
+  { v0: '13', v1: '14', name: 'ring 1' },
+  { v0: '14', v1: '15', name: 'ring 2' },
+  { v0: '15', v1: '16', name: 'ring 3' },
+  // pinky
+  { v0: '17', v1: '18', name: 'pinky 1' },
+  { v0: '18', v1: '19', name: 'pinky 2' },
+  { v0: '19', v1: '20', name: 'pinky 3' }
+];
+
 class HandRenderer {
   constructor(gl) {
     // set camera pose
@@ -4116,68 +4178,6 @@ class HandRenderer {
 
     // Create an empty skeleton for now.
     this.skeleton = new Skeleton();
-
-    // set wrist anchor
-    const wrist = new Vector$1(-2, 0, 0.25);
-
-    // set initial landmark positions (numbered according to fig 2 of https://google.github.io/mediapipe/solutions/hands.html)
-    const landmarks = {
-      '-2': new Vector$1(-15, 0, 0),
-      '-1': new Vector$1(-8.4, 0, 0.15),
-      '0': wrist,
-      '1': wrist.add(new Vector$1(0, -0.1, -0.75)),
-      '2': wrist.add(new Vector$1(0.8, -0.45, -1.15)),
-      '3': wrist.add(new Vector$1(1.4, -0.7, -1.4)),
-      '4': wrist.add(new Vector$1(1.8, -0.9, -1.55)),
-      5: wrist.add(new Vector$1(1.7, -0.1, -0.85)),
-      6: wrist.add(new Vector$1(2.4, -0.35, -0.95)),
-      7: wrist.add(new Vector$1(2.8, -0.525, -1)),
-      8: wrist.add(new Vector$1(3.1, -0.65, -1.08)),
-      9: wrist.add(new Vector$1(1.8, -0.1, -0.25)),
-      10: wrist.add(new Vector$1(2.6, -0.3, -0.3)),
-      11: wrist.add(new Vector$1(3.1, -0.48, -0.35)),
-      12: wrist.add(new Vector$1(3.5, -0.55, -0.4)),
-      13: wrist.add(new Vector$1(1.75, -0.15, 0.25)),
-      14: wrist.add(new Vector$1(2.4, -0.38, 0.3)),
-      15: wrist.add(new Vector$1(2.85, -0.5, 0.35)),
-      16: wrist.add(new Vector$1(3.18, -0.58, 0.38)),
-      17: wrist.add(new Vector$1(1.55, -0.25, 0.65)),
-      18: wrist.add(new Vector$1(2.1, -0.55, 0.78)),
-      19: wrist.add(new Vector$1(2.35, -0.7, 0.84)),
-      20: wrist.add(new Vector$1(2.68, -0.85, 0.93)),
-    };
-    const joints = [
-      // arm
-      { v0: '-2', v1: '-1', name: 'upper arm' },
-      { v0: '-1', v1: '0',  name: 'lower arm' },
-      // thumb
-      { v0: '0', v1: '1', name: 'thumb 1' },
-      { v0: '1', v1: '2', name: 'thumb 2' },
-      { v0: '2', v1: '3', name: 'thumb 3' },
-      { v0: '3', v1: '4', name: 'thumb 4' },
-      // palm
-      { v0: '0',  v1: '5',  name: 'palm 1' },
-      { v0: '0',  v1: '17', name: 'palm 2' },
-      { v0: '5',  v1: '9',  name: 'palm 3' },
-      { v0: '9',  v1: '13', name: 'palm 4' },
-      { v0: '13', v1: '17', name: 'palm 5' },
-      // index
-      { v0: '5', v1: '6', name: 'index 1' },
-      { v0: '6', v1: '7', name: 'index 2' },
-      { v0: '7', v1: '8', name: 'index 3' },
-      // middle
-      { v0: '9',  v1: '10', name: 'middle 1' },
-      { v0: '10', v1: '11', name: 'middle 2' },
-      { v0: '11', v1: '12', name: 'middle 3' },
-      // ring
-      { v0: '13', v1: '14', name: 'ring 1' },
-      { v0: '14', v1: '15', name: 'ring 2' },
-      { v0: '15', v1: '16', name: 'ring 3' },
-      // pinky
-      { v0: '17', v1: '18', name: 'pinky 1' },
-      { v0: '18', v1: '19', name: 'pinky 2' },
-      { v0: '19', v1: '20', name: 'pinky 3' }
-    ];
 
     // helper
     const addSeparation = (v0, v1) => {
@@ -4206,7 +4206,23 @@ class HandRenderer {
     gl.enable(gl.DEPTH_TEST);
   }
 
-  render(gl, w, h) {
+  /* 
+  1  0  0  0 | 1
+  0  1  0  0 | 1
+  0  0  1  0 | 1
+  0  0  0  1 | 1
+
+
+  */  
+  transformVector(m, v) {
+    return new Vector$1(
+      m[0] * v.x + m[1] * v.y + m[2] * v.z,
+      m[4] * v.x + m[5] * v.y + m[6] * v.z,
+      m[8] * v.x + m[9] * v.y + m[10] * v.z
+    );
+  }
+
+  render(gl, w, h, positions) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -4223,16 +4239,62 @@ class HandRenderer {
 
     if (this.skeleton) {
       gl.clear(gl.DEPTH_BUFFER_BIT);
+
+      // loop over every position in the new hand positions
+      // for (var i = 2; i < positions.length; i++) {
+        // get the position
+
+      if (positions.length > 0) {
+        // x: right
+        // y: up
+        // z: towards camera
+
+        // left to right from mediapipe, goes up and down (x, y)
+
+        // transform from mediapipe to world space
+        const transformPos = (pos) => {
+          var xRot = Matrix.rotate(180, 1, 0, 0);
+          var yRot = Matrix.rotate(-270, 0, 1, 0);
+
+          // -0.5 offsets the wrist to the center of screen
+          var wristVector = new Vector$1(4.0*(pos.x - 0.5), 4.0*(pos.y - 0.5), 4.0*(pos.z - 0.5));
+          var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
+          return this.transformVector(yRot.m, rotWristVector);
+        };
+
+        // for each position, update all joints that use the landmark
+        positions.forEach((position, idx) => {
+          // find all joints that use this
+          const { v0s, v1s } = joints.reduce((acc, j, id) => {
+            if (j.v0 === idx.toString()) acc.v0s.push(id);
+            if (j.v1 === idx.toString()) acc.v1s.push(id);
+            return acc;
+          }, { v0s: [], v1s: [] });
+
+          // get new pos in world space
+          const pos = transformPos(position);
+
+          v0s.forEach(id => {
+            // update joint origin
+            this.skeleton.getJoint(id).setJointOrigin(pos);
+          });
+          v1s.forEach(id => {
+            // update joint end
+            this.skeleton.getJoint(id).setJointEnd(pos);
+          });
+        });
+      }
+
       this.skeleton.render(gl, view, projection);
     }
   }
 
-  setJointEndpoints(id, v0, v1) {
-    if (this.skeleton && id < this.skeleton.getNumJoints()) {
-      this.skeleton.getJoint(id).setJointEndpoints(v0, v1);
-      this.skin.updateSkin();
-    }
-  }
+  // setJointEndpoints(id, v0, v1) {
+  //   if (this.skeleton && id < this.skeleton.getNumJoints()) {
+  //     this.skeleton.getJoint(id).setJointEndpoints(v0, v1);
+  //     this.skin.updateSkin();
+  //   }
+  // }
 
   dragCamera(dx, dy) {
     this.pitch = Math.min(Math.max(this.pitch + dy * 0.5, -180), 180);
@@ -4296,6 +4358,8 @@ function setupTask(canvasId, taskFunction) {
 
   var mouseDown = false;
   var lastMouseX, lastMouseY;
+  var positions = [];
+
   var mouseMoveListener = function(event) {
     task.dragCamera(event.screenX - lastMouseX, event.screenY - lastMouseY);
     lastMouseX = event.screenX;
@@ -4328,20 +4392,43 @@ function setupTask(canvasId, taskFunction) {
   canvas.parentNode.appendChild(uiContainer);
 
   renderLoop = function() {
-    task.render(gl, renderWidth, renderHeight);
+    task.render(gl, renderWidth, renderHeight, positions);
     setTimeout(() => window.requestAnimationFrame(renderLoop), 1000 / 60);
   };
 
   window.requestAnimationFrame(renderLoop);
 
   hands.onResults((results) => {
-    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0)
-      console.log(results.multiHandLandmarks[0]);
-      // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-      // window.requestAnimationFrame(renderLoop);
+
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(
+        results.image, 0, 0, canvasElement.width, canvasElement.height);
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      positions = results.multiHandLandmarks[0];
+
+      /* for (const landmarks of results.multiHandLandmarks) {
+        drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
+                      {color: '#00FF00', lineWidth: 5});
+      } */
+      drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
+
+    } else {
+      positions = [];
+    }
+
+    canvasCtx.restore();
+
+    /* if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      window.requestAnimationFrame(renderLoop);
+    } else {
+      positions = [];
+    }*/
   });
 
-  new Camera(videoElement, {
+  const camera = new Camera(videoElement, {
     onFrame: async () => {
       await hands.send({ image: videoElement });
     },
@@ -4349,7 +4436,7 @@ function setupTask(canvasId, taskFunction) {
     height: 360
   });
 
-  // camera.start();
+  camera.start();
 }
 
 // entrypoint
