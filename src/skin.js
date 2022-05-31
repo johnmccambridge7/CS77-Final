@@ -4,6 +4,7 @@ import {
 	SolidFragmentSource,
 	WeightVertexSource,
 	WeightFragmentSource,
+	WeightShadedTriangleMesh,
 	TriangleMesh
 } from './common';
 import {
@@ -188,13 +189,7 @@ export class SkinMesh {
 	// Typically caused by the UI angle change
 	// However in case of animations, you can use this function to do the same functionality.
 	updateSkin() {
-		if (this.mSkinMode == "rigid") {
-			this.rigidSkinning();
-
-		}
-		else if (this.mSkinMode == "linear") {
-			this.linearBlendSkinning();
-		}
+		this.linearBlendSkinning();
 
 		if (!this.mShowWeights)
 			this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.mIndices, this.shader);

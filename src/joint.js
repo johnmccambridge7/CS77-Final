@@ -29,10 +29,10 @@ export class Joint {
       CubePositions,
       CubeIndices,
       shader,
-      true,
-      true,
-      new Vector(0.4, 0.7, 0.4),
-      new Vector(0.5, 1, 0.5)
+      false,
+      false,
+      new Vector(0.0, 0.0, 0.0),
+      new Vector(0.0, 0.0, 0.0)
     );
 
     this.mJointAngle = null;

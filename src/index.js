@@ -114,7 +114,7 @@ function setupTask(canvasId, taskFunction) {
         drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
                       {color: '#00FF00', lineWidth: 5});
       } */
-      // drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
+      drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
 
     } else {
       positions = [];
@@ -135,8 +135,8 @@ function setupTask(canvasId, taskFunction) {
     onFrame: async () => {
       await hands.send({ image: videoElement });
     },
-    width: 662,
-    height: 372
+    width: 480,
+    height: 360
   });
 
   camera.start();

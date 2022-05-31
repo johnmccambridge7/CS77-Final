@@ -918,6 +918,27 @@ class TriangleMesh {
   }
 }
 
+
+// WeightMesh - used to show the weights of the mesh
+class WeightShadedTriangleMesh {
+  constructor(gl, vertexPositions, weights, indices, shaderProgram, drawFaces, drawEdges, faceColor, edgeColor) {
+    this.triangleMesh = new TriangleMesh(gl, vertexPositions, indices, shaderProgram, drawFaces, drawEdges, faceColor, edgeColor);
+    this.weightsVbo = createVertexBuffer(gl, weights);
+    this.shaderProgram = shaderProgram;
+  }
+
+  render(gl, model, view, projection) {
+    gl.useProgram(this.shaderProgram);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.weightsVbo);
+    var weightAttrib = gl.getAttribLocation(this.shaderProgram, "Weight");
+    gl.enableVertexAttribArray(weightAttrib);
+    gl.vertexAttribPointer(weightAttrib, 1, gl.FLOAT, false, 0, 0);
+
+    this.triangleMesh.render(gl, model, view, projection);
+  }
+}
+
 var armPositions = [
 3.285786,0.983086,-0.719792,
 3.361667,0.600166,-0.849336,
@@ -3729,13 +3750,7 @@ class SkinMesh {
 	// Typically caused by the UI angle change
 	// However in case of animations, you can use this function to do the same functionality.
 	updateSkin() {
-		if (this.mSkinMode == "rigid") {
-			this.rigidSkinning();
-
-		}
-		else if (this.mSkinMode == "linear") {
-			this.linearBlendSkinning();
-		}
+		this.linearBlendSkinning();
 
 		if (!this.mShowWeights)
 			this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.mIndices, this.shader);
@@ -3994,10 +4009,10 @@ class Joint {
       CubePositions,
       CubeIndices,
       shader,
-      true,
-      true,
-      new Vector(0.4, 0.7, 0.4),
-      new Vector(0.5, 1, 0.5)
+      false,
+      false,
+      new Vector(0.0, 0.0, 0.0),
+      new Vector(0.0, 0.0, 0.0)
     );
 
     this.mJointAngle = null;
@@ -4276,6 +4291,7 @@ class HandRenderer {
           v0s.forEach(id => {
             // update joint origin
             this.skeleton.getJoint(id).setJointOrigin(pos);
+            // this.skin.showJointWeights(id);
           });
           v1s.forEach(id => {
             // update joint end
@@ -4411,7 +4427,7 @@ function setupTask(canvasId, taskFunction) {
         drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
                       {color: '#00FF00', lineWidth: 5});
       } */
-      // drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
+      drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
 
     } else {
       positions = [];
@@ -4432,8 +4448,8 @@ function setupTask(canvasId, taskFunction) {
     onFrame: async () => {
       await hands.send({ image: videoElement });
     },
-    width: 662,
-    height: 372
+    width: 480,
+    height: 360
   });
 
   camera.start();

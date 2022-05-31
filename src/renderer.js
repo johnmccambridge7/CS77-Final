@@ -181,6 +181,7 @@ export class HandRenderer {
           v0s.forEach(id => {
             // update joint origin
             this.skeleton.getJoint(id).setJointOrigin(pos);
+            // this.skin.showJointWeights(id);
           });
           v1s.forEach(id => {
             // update joint end
