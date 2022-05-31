@@ -104,7 +104,7 @@ export class TriangleMesh {
     this.drawFaces = defaultArg(drawFaces, true);
     this.drawEdges = defaultArg(drawEdges, true);
     this.faceColor = defaultArg(faceColor, new Vector(1, 1, 1));
-    this.edgeColor = defaultArg(edgeColor, new Vector(0.5, 0.5, 0.5));
+    this.edgeColor = defaultArg(edgeColor, new Vector(0.0, 0.0, 1.0));
 
     this.positionVbo = createVertexBuffer(gl, vertexPositions);
     if (this.drawFaces) {

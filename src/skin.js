@@ -279,7 +279,7 @@ export class SkinMesh {
 			this.newIndices.push(i0);
 		}
 
-		this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.newIndices, this.shader);
+		this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.newIndices, this.shader, false, false);
 	}
 
 	// Attaches ("binds") a skeleton to the skin.

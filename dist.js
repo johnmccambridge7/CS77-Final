@@ -865,7 +865,7 @@ class TriangleMesh {
     this.drawFaces = defaultArg(drawFaces, true);
     this.drawEdges = defaultArg(drawEdges, true);
     this.faceColor = defaultArg(faceColor, new Vector(1, 1, 1));
-    this.edgeColor = defaultArg(edgeColor, new Vector(0.5, 0.5, 0.5));
+    this.edgeColor = defaultArg(edgeColor, new Vector(0.0, 0.0, 1.0));
 
     this.positionVbo = createVertexBuffer(gl, vertexPositions);
     if (this.drawFaces) {
@@ -3840,7 +3840,7 @@ class SkinMesh {
 			this.newIndices.push(i0);
 		}
 
-		this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.newIndices, this.shader);
+		this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.newIndices, this.shader, false, false);
 	}
 
 	// Attaches ("binds") a skeleton to the skin.
@@ -4236,7 +4236,7 @@ class HandRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var projection = Matrix.perspective(60, w / h, 0.1, 100);
-    var view = Matrix.translate(-8, 0, -5).multiply(
+    var view = Matrix.translate(-8, 0, -10).multiply(
       Matrix.rotate(this.pitch, 1, 0, 0)).multiply(
         Matrix.rotate(this.yaw, 0, 1, 0)).multiply(
           Matrix.translate(8, 0, 0)).multiply(

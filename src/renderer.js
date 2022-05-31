@@ -126,7 +126,7 @@ export class HandRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var projection = Matrix.perspective(60, w / h, 0.1, 100);
-    var view = Matrix.translate(-8, 0, -5).multiply(
+    var view = Matrix.translate(-8, 0, -10).multiply(
       Matrix.rotate(this.pitch, 1, 0, 0)).multiply(
         Matrix.rotate(this.yaw, 0, 1, 0)).multiply(
           Matrix.translate(8, 0, 0)).multiply(
