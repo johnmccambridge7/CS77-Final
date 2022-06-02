@@ -23,13 +23,13 @@ hands.setOptions({
 
 function setupTask(canvasId, taskFunction) {
   const videoElement = document.getElementsByClassName('input_video')[0];
-  const canvasElement = document.getElementsByClassName('output_canvas')[0];
-  const canvasCtx = canvasElement.getContext('2d');
+  // const canvasElement = document.getElementsByClassName('output_canvas')[0];
+  // const canvasCtx = canvasElement.getContext('2d');
 
   var renderLoop;
 
-  canvasCtx.save();
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  // canvasCtx.save();
+  // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
   var canvas = document.getElementById(canvasId);
   if (!canvas) {
@@ -102,10 +102,10 @@ function setupTask(canvasId, taskFunction) {
   window.requestAnimationFrame(renderLoop);
 
   hands.onResults((results) => {
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    canvasCtx.drawImage(
-        results.image, 0, 0, canvasElement.width, canvasElement.height);
+    // canvasCtx.save();
+    // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    // canvasCtx.drawImage(
+    //     results.image, 0, 0, canvasElement.width, canvasElement.height);
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
       positions = results.multiHandLandmarks[0];
 
@@ -113,7 +113,7 @@ function setupTask(canvasId, taskFunction) {
         drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
                       {color: '#00FF00', lineWidth: 5});
       } */
-      drawLandmarks(canvasCtx, positions, {color: '#FF0000', lineWidth: 2});
+      // drawLandmarks(canvasCtx, positions, {color: '#FF0000', lineWidth: 2});
 
       // update skeleton
       task.updatePose(positions);
@@ -121,7 +121,7 @@ function setupTask(canvasId, taskFunction) {
       positions = [];
     }
 
-    canvasCtx.restore();
+    // canvasCtx.restore();
 
     /* if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
 
