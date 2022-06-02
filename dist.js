@@ -4415,7 +4415,7 @@ class HandRenderer {
       const renderedWrist = this.skeleton.getJoint(2).mOriginPosition;
       const bindingPoseHandLength = landmarks[12].subtract(renderedWrist).length();
 
-      if (this.handLengths.length > 75) this.handLengths.shift();
+      if (this.handLengths.length > 200) this.handLengths.shift();
       const scaleFactor = bindingPoseHandLength / lib(this.handLengths, 0.95);
 
       // transform from mediapipe to world space
