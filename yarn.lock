@@ -150,6 +150,13 @@ commondir@^1.0.1:
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
   integrity sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=
 
+compute-quantile@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/compute-quantile/-/compute-quantile-1.0.1.tgz#30723bac616d9cc5e27c0e0775a9d3567dfbad66"
+  integrity sha512-0o7szTa9QIs/1ZFdGwfS4gmo9df5elEGyLh+hpr1Ap1gsWQtNPHqChfJGR3Kt8swxqkgOUuUERnmVy0Zd7x2+Q==
+  dependencies:
+    validate.io-object "^1.0.0"
+
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
@@ -498,6 +505,18 @@ url-join@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/url-join/-/url-join-4.0.1.tgz#b642e21a2646808ffa178c4c5fda39844e12cde7"
   integrity sha512-jk1+QP6ZJqyOiuEI9AEWQfju/nB2Pw466kbA0LEZljHwKeMgd9WrAEgEGxjPDD2+TNbbb37rTyhEfrCXfuKXnA==
+
+validate.io-array@^1.0.1:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/validate.io-array/-/validate.io-array-1.0.6.tgz#5b5a2cafd8f8b85abb2f886ba153f2d93a27774d"
+  integrity sha1-W1osr9j4uFq7L4hroVPy2Tond00=
+
+validate.io-object@^1.0.0:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/validate.io-object/-/validate.io-object-1.0.4.tgz#dca01eceee390e110dbc2af843c81f7bf33a41ab"
+  integrity sha1-3KAezu45DhENvCr4Q8gfe/M6Qas=
+  dependencies:
+    validate.io-array "^1.0.1"
 
 whatwg-encoding@^2.0.0:
   version "2.0.0"

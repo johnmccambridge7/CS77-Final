@@ -33,6 +33,10 @@ export class Vector {
     this.z = z || 0;
   }
 
+  static fromMediapipeVec(v) {
+    return new Vector(v.x, v.y, v.z);
+  }
+
   negative() {
     return new Vector(-this.x, -this.y, -this.z);
   }

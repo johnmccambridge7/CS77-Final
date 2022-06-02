@@ -1,3 +1,5 @@
+import quantile from 'compute-quantile';
+
 import { SkinMesh } from './skin';
 import { Skeleton } from './skeleton';
 import { Matrix } from './matrix';
@@ -103,6 +105,9 @@ export class HandRenderer {
     // pass skeleton to skin
     this.skin.setSkeleton(this.skeleton, 'linear');
 
+    // keep track of longest recorded hand (at middle finger) from mediapipe (for scaling)
+    this.handLengths = [];
+
     gl.enable(gl.DEPTH_TEST);
   }
 
@@ -121,7 +126,81 @@ export class HandRenderer {
     );
   }
 
-  render(gl, w, h, positions) {
+  updatePose(positions) {
+    if (positions.length > 0) {
+      // x: right
+      // y: up
+      // z: towards camera
+
+      // left to right from mediapipe, goes up and down (x, y)
+
+      // normalize hand
+      const mediapipeWrist = Vector.fromMediapipeVec(positions[0]);
+      const mediapipeMiddleFinger = Vector.fromMediapipeVec(positions[12]);
+      const handLength = mediapipeWrist.subtract(mediapipeMiddleFinger).length();
+      this.handLengths.push(handLength);
+      const renderedWrist = this.skeleton.getJoint(2).mOriginPosition;
+      const bindingPoseHandLength = landmarks[12].subtract(renderedWrist).length();
+
+      if (this.handLengths.length > 75) this.handLengths.shift();
+      const scaleFactor = bindingPoseHandLength / quantile(this.handLengths, 0.95);
+
+      // transform from mediapipe to world space
+      const transformPos = (pos) => {
+        const xRot = Matrix.rotate(-90, 1, 0, 0);
+        const yRot = Matrix.rotate(90, 0, 1, 0);
+        const scale = Matrix.scale(scaleFactor, scaleFactor, scaleFactor * 1.5);
+
+        // -2, 0, 0.25
+        // -0.5 offsets the wrist to the center of screen
+        // more negative x, moves the hand to the right
+        // var wristVector =  new Vector(4.0*(pos.x) - 2.0, 4.0*(pos.y), 4.0*(pos.z)); // new Vector(4.0*(pos.x) + 0.5, 4.0*(pos.y) - 2.0, 4.0*(pos.z));
+        // var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
+        // var yRotWrist = this.transformVector(yRot.m, rotWristVector);
+        // var finalWrist = this.transformVector(zRot.m, yRotWrist);
+
+        // return yRotWrist;
+
+        let vec = Vector.fromMediapipeVec(pos);
+        // back to origin;
+        vec = vec.subtract(mediapipeWrist);
+        // rotate
+        vec = this.transformVector(xRot.m, vec);
+        vec = this.transformVector(yRot.m, vec);
+        // scale
+        vec = this.transformVector(scale.m, vec);
+        // move to render wrist
+        vec = vec.add(renderedWrist);
+
+        return vec;
+      };
+
+      // for each position, update all joints that use the landmark
+      positions.forEach((position, idx) => {
+        // find all joints that use this
+        const { v0s, v1s } = joints.reduce((acc, j, id) => {
+          if (j.v0 === idx.toString()) acc.v0s.push(id);
+          if (j.v1 === idx.toString()) acc.v1s.push(id);
+          return acc;
+        }, { v0s: [], v1s: [] });
+
+        // get new pos in world space
+        const pos = transformPos(position);
+
+        v0s.forEach(id => {
+          // update joint origin
+          this.skeleton.getJoint(id).setJointOrigin(pos);
+          // this.skin.showJointWeights(id);
+        });
+        v1s.forEach(id => {
+          // update joint end
+          this.skeleton.getJoint(id).setJointEnd(pos);
+        });
+      });
+    }
+  }
+
+  render(gl, w, h) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -133,62 +212,11 @@ export class HandRenderer {
             Matrix.rotate(30, 1, 0, 0));
 
     if (this.skin) {
-      this.skin.render(gl, view, projection, false);
+      this.skin.render(gl, view, projection, true);
     }
 
     if (this.skeleton) {
       gl.clear(gl.DEPTH_BUFFER_BIT);
-
-      // loop over every position in the new hand positions
-      // for (var i = 2; i < positions.length; i++) {
-        // get the position
-
-      if (positions.length > 0) {
-        // x: right
-        // y: up
-        // z: towards camera
-
-        // left to right from mediapipe, goes up and down (x, y)
-
-        // transform from mediapipe to world space
-        const transformPos = (pos) => {
-          var xRot = Matrix.rotate(270, 1, 0, 0);
-          var yRot = Matrix.rotate(-270, 0, 1, 0);
-
-          // -2, 0, 0.25
-          // -0.5 offsets the wrist to the center of screen
-          // more negative x, moves the hand to the right
-          var wristVector =  new Vector(4.0*(pos.x) - 2.0, 4.0*(pos.y), 4.0*(pos.z)); // new Vector(4.0*(pos.x) + 0.5, 4.0*(pos.y) - 2.0, 4.0*(pos.z));
-          var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
-          var yRotWrist = this.transformVector(yRot.m, rotWristVector);
-          // var finalWrist = this.transformVector(zRot.m, yRotWrist);
-
-          return yRotWrist;
-        };
-
-        // for each position, update all joints that use the landmark
-        positions.forEach((position, idx) => {
-          // find all joints that use this
-          const { v0s, v1s } = joints.reduce((acc, j, id) => {
-            if (j.v0 === idx.toString()) acc.v0s.push(id);
-            if (j.v1 === idx.toString()) acc.v1s.push(id);
-            return acc;
-          }, { v0s: [], v1s: [] });
-
-          // get new pos in world space
-          const pos = transformPos(position);
-
-          v0s.forEach(id => {
-            // update joint origin
-            this.skeleton.getJoint(id).setJointOrigin(pos);
-            // this.skin.showJointWeights(id);
-          });
-          v1s.forEach(id => {
-            // update joint end
-            this.skeleton.getJoint(id).setJointEnd(pos);
-          });
-        });
-      }
 
       this.skeleton.render(gl, view, projection);
       this.skin.updateSkin();

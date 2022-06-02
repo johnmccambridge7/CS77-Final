@@ -31,8 +31,8 @@ export class Joint {
       shader,
       false,
       false,
-      new Vector(0.0, 0.0, 0.0),
-      new Vector(0.0, 0.0, 0.0)
+      new Vector(1.0, 0.0, 0.0),
+      new Vector(1.0, 0.0, 0.0)
     );
 
     this.mJointAngle = null;

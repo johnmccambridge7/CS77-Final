@@ -198,6 +198,167 @@ class ButtonGroup {
   }
 }
 
+/**
+* FUNCTION: isArray( value )
+*	Validates if a value is an array.
+*
+* @param {*} value - value to be validated
+* @returns {Boolean} boolean indicating whether value is an array
+*/
+function isArray$1( value ) {
+	return Object.prototype.toString.call( value ) === '[object Array]';
+} // end FUNCTION isArray()
+
+// EXPORTS //
+
+var lib$2 = Array.isArray || isArray$1;
+
+// MODULES //
+
+var isArray = lib$2;
+
+
+// ISOBJECT //
+
+/**
+* FUNCTION: isObject( value )
+*	Validates if a value is a object; e.g., {}.
+*
+* @param {*} value - value to be validated
+* @returns {Boolean} boolean indicating whether value is a object
+*/
+function isObject$1( value ) {
+	return ( typeof value === 'object' && value !== null && !isArray( value ) );
+} // end FUNCTION isObject()
+
+
+// EXPORTS //
+
+var lib$1 = isObject$1;
+
+/**
+*
+*	COMPUTE: quantile
+*
+*
+*	DESCRIPTION:
+*		- Computes a quantile for a numeric array.
+*
+*
+*	NOTES:
+*		[1]
+*
+*
+*	TODO:
+*		[1]
+*
+*
+*	LICENSE:
+*		MIT
+*
+*	Copyright (c) 2014. Athan Reines.
+*
+*
+*	AUTHOR:
+*		Athan Reines. kgryte@gmail.com. 2014.
+*
+*/
+
+// MODULES //
+
+var isObject = lib$1;
+
+
+// FUNCTIONS //
+
+/**
+* FUNCTION: ascending( a, b )
+*	Comparator function used to sort values in ascending order.
+*
+* @private
+* @param {Number} a
+* @param {Number} b
+* @returns {Number} difference between `a` and `b`
+*/
+function ascending( a, b ) {
+	return a - b;
+} // end FUNCTION ascending()
+
+
+// QUANTILE //
+
+/**
+* FUNCTION: quantile( arr, prob[, opts] )
+*	Computes a quantile for a numeric array.
+*
+* @private
+* @param {Array} arr - 1d array
+* @param {Number} prob - quantile prob [0,1]
+* @param {Object} [opts] - method options:
+	`method`: method used to interpolate a quantile value
+	`sorted`: boolean flag indicating if the input array is sorted
+* @returns {Number} quantile value
+*/
+function quantile( arr, p, opts ) {
+	if ( !Array.isArray( arr ) ) {
+		throw new TypeError( 'quantile()::invalid input argument. First argument must be an array.' );
+	}
+	if ( typeof p !== 'number' || p !== p ) {
+		throw new TypeError( 'quantile()::invalid input argument. Quantile probability must be numeric.' );
+	}
+	if ( p < 0 || p > 1 ) {
+		throw new TypeError( 'quantile()::invalid input argument. Quantile probability must be on the interval [0,1].' );
+	}
+	if ( arguments.length > 2 ) {
+		if ( !isObject( opts ) ) {
+			throw new TypeError( 'quantile()::invalid input argument. Options must be an object.' );
+		}
+		if ( opts.hasOwnProperty( 'sorted' ) && typeof opts.sorted !== 'boolean' ) {
+			throw new TypeError( 'quantile()::invalid input argument. Sorted flag must be a boolean.' );
+		}
+		if ( opts.hasOwnProperty( 'method' ) && typeof opts.method !== 'string' ) {
+			throw new TypeError( 'quantile()::invalid input argument. Method must be a string.' );
+		}
+		// TODO: validate that the requested method is supported. list.indexOf( method )
+	} else {
+		opts = {};
+	}
+	var len = arr.length,
+		id;
+
+	if ( !opts.sorted ) {
+		arr = arr.slice();
+		arr.sort( ascending );
+	}
+
+	// Cases...
+
+	// [0] 0th percentile is the minimum value...
+	if ( p === 0.0 ) {
+		return arr[ 0 ];
+	}
+	// [1] 100th percentile is the maximum value...
+	if ( p === 1.0 ) {
+		return arr[ len-1 ];
+	}
+	// Calculate the vector index marking the quantile:
+	id = ( len*p ) - 1;
+
+	// [2] Is the index an integer?
+	if ( id === Math.floor( id ) ) {
+		// Value is the average between the value at id and id+1:
+		return ( arr[ id ] + arr[ id+1 ] ) / 2.0;
+	}
+	// [3] Round up to the next index:
+	id = Math.ceil( id );
+	return arr[ id ];
+} // end FUNCTION quantile()
+
+
+// EXPORTS //
+
+var lib = quantile;
+
 /*
   lightgl.js vector class
   https://github.com/evanw/lightgl.js/
@@ -231,6 +392,10 @@ class Vector {
     this.x = x || 0;
     this.y = y || 0;
     this.z = z || 0;
+  }
+
+  static fromMediapipeVec(v) {
+    return new Vector(v.x, v.y, v.z);
   }
 
   negative() {
@@ -4011,8 +4176,8 @@ class Joint {
       shader,
       false,
       false,
-      new Vector(0.0, 0.0, 0.0),
-      new Vector(0.0, 0.0, 0.0)
+      new Vector(1.0, 0.0, 0.0),
+      new Vector(1.0, 0.0, 0.0)
     );
 
     this.mJointAngle = null;
@@ -4213,6 +4378,9 @@ class HandRenderer {
     // pass skeleton to skin
     this.skin.setSkeleton(this.skeleton, 'linear');
 
+    // keep track of longest recorded hand (at middle finger) from mediapipe (for scaling)
+    this.handLengths = [];
+
     gl.enable(gl.DEPTH_TEST);
   }
 
@@ -4231,7 +4399,81 @@ class HandRenderer {
     );
   }
 
-  render(gl, w, h, positions) {
+  updatePose(positions) {
+    if (positions.length > 0) {
+      // x: right
+      // y: up
+      // z: towards camera
+
+      // left to right from mediapipe, goes up and down (x, y)
+
+      // normalize hand
+      const mediapipeWrist = Vector.fromMediapipeVec(positions[0]);
+      const mediapipeMiddleFinger = Vector.fromMediapipeVec(positions[12]);
+      const handLength = mediapipeWrist.subtract(mediapipeMiddleFinger).length();
+      this.handLengths.push(handLength);
+      const renderedWrist = this.skeleton.getJoint(2).mOriginPosition;
+      const bindingPoseHandLength = landmarks[12].subtract(renderedWrist).length();
+
+      if (this.handLengths.length > 75) this.handLengths.shift();
+      const scaleFactor = bindingPoseHandLength / lib(this.handLengths, 0.95);
+
+      // transform from mediapipe to world space
+      const transformPos = (pos) => {
+        const xRot = Matrix.rotate(-90, 1, 0, 0);
+        const yRot = Matrix.rotate(90, 0, 1, 0);
+        const scale = Matrix.scale(scaleFactor, scaleFactor, scaleFactor * 1.5);
+
+        // -2, 0, 0.25
+        // -0.5 offsets the wrist to the center of screen
+        // more negative x, moves the hand to the right
+        // var wristVector =  new Vector(4.0*(pos.x) - 2.0, 4.0*(pos.y), 4.0*(pos.z)); // new Vector(4.0*(pos.x) + 0.5, 4.0*(pos.y) - 2.0, 4.0*(pos.z));
+        // var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
+        // var yRotWrist = this.transformVector(yRot.m, rotWristVector);
+        // var finalWrist = this.transformVector(zRot.m, yRotWrist);
+
+        // return yRotWrist;
+
+        let vec = Vector.fromMediapipeVec(pos);
+        // back to origin;
+        vec = vec.subtract(mediapipeWrist);
+        // rotate
+        vec = this.transformVector(xRot.m, vec);
+        vec = this.transformVector(yRot.m, vec);
+        // scale
+        vec = this.transformVector(scale.m, vec);
+        // move to render wrist
+        vec = vec.add(renderedWrist);
+
+        return vec;
+      };
+
+      // for each position, update all joints that use the landmark
+      positions.forEach((position, idx) => {
+        // find all joints that use this
+        const { v0s, v1s } = joints.reduce((acc, j, id) => {
+          if (j.v0 === idx.toString()) acc.v0s.push(id);
+          if (j.v1 === idx.toString()) acc.v1s.push(id);
+          return acc;
+        }, { v0s: [], v1s: [] });
+
+        // get new pos in world space
+        const pos = transformPos(position);
+
+        v0s.forEach(id => {
+          // update joint origin
+          this.skeleton.getJoint(id).setJointOrigin(pos);
+          // this.skin.showJointWeights(id);
+        });
+        v1s.forEach(id => {
+          // update joint end
+          this.skeleton.getJoint(id).setJointEnd(pos);
+        });
+      });
+    }
+  }
+
+  render(gl, w, h) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -4243,62 +4485,11 @@ class HandRenderer {
             Matrix.rotate(30, 1, 0, 0));
 
     if (this.skin) {
-      this.skin.render(gl, view, projection, false);
+      this.skin.render(gl, view, projection, true);
     }
 
     if (this.skeleton) {
       gl.clear(gl.DEPTH_BUFFER_BIT);
-
-      // loop over every position in the new hand positions
-      // for (var i = 2; i < positions.length; i++) {
-        // get the position
-
-      if (positions.length > 0) {
-        // x: right
-        // y: up
-        // z: towards camera
-
-        // left to right from mediapipe, goes up and down (x, y)
-
-        // transform from mediapipe to world space
-        const transformPos = (pos) => {
-          var xRot = Matrix.rotate(270, 1, 0, 0);
-          var yRot = Matrix.rotate(-270, 0, 1, 0);
-
-          // -2, 0, 0.25
-          // -0.5 offsets the wrist to the center of screen
-          // more negative x, moves the hand to the right
-          var wristVector =  new Vector(4.0*(pos.x) - 2.0, 4.0*(pos.y), 4.0*(pos.z)); // new Vector(4.0*(pos.x) + 0.5, 4.0*(pos.y) - 2.0, 4.0*(pos.z));
-          var rotWristVector = this.transformVector(xRot.m, wristVector); // wristVector.multiply(Matrix.rotate(0, 1, 1, 1)); // .multiply(Matrix.rotate(180, 0, 1, 0));
-          var yRotWrist = this.transformVector(yRot.m, rotWristVector);
-          // var finalWrist = this.transformVector(zRot.m, yRotWrist);
-
-          return yRotWrist;
-        };
-
-        // for each position, update all joints that use the landmark
-        positions.forEach((position, idx) => {
-          // find all joints that use this
-          const { v0s, v1s } = joints.reduce((acc, j, id) => {
-            if (j.v0 === idx.toString()) acc.v0s.push(id);
-            if (j.v1 === idx.toString()) acc.v1s.push(id);
-            return acc;
-          }, { v0s: [], v1s: [] });
-
-          // get new pos in world space
-          const pos = transformPos(position);
-
-          v0s.forEach(id => {
-            // update joint origin
-            this.skeleton.getJoint(id).setJointOrigin(pos);
-            // this.skin.showJointWeights(id);
-          });
-          v1s.forEach(id => {
-            // update joint end
-            this.skeleton.getJoint(id).setJointEnd(pos);
-          });
-        });
-      }
 
       this.skeleton.render(gl, view, projection);
       this.skin.updateSkin();
@@ -4408,14 +4599,13 @@ function setupTask(canvasId, taskFunction) {
   canvas.parentNode.appendChild(uiContainer);
 
   renderLoop = function() {
-    task.render(gl, renderWidth, renderHeight, positions);
+    task.render(gl, renderWidth, renderHeight);
     setTimeout(() => window.requestAnimationFrame(renderLoop), 1000 / 60);
   };
 
   window.requestAnimationFrame(renderLoop);
 
   hands.onResults((results) => {
-
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(
@@ -4427,8 +4617,10 @@ function setupTask(canvasId, taskFunction) {
         drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
                       {color: '#00FF00', lineWidth: 5});
       } */
-      drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
+      drawLandmarks(canvasCtx, positions, {color: '#FF0000', lineWidth: 2});
 
+      // update skeleton
+      task.updatePose(positions);
     } else {
       positions = [];
     }

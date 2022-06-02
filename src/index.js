@@ -95,14 +95,13 @@ function setupTask(canvasId, taskFunction) {
   canvas.parentNode.appendChild(uiContainer);
 
   renderLoop = function() {
-    task.render(gl, renderWidth, renderHeight, positions);
+    task.render(gl, renderWidth, renderHeight);
     setTimeout(() => window.requestAnimationFrame(renderLoop), 1000 / 60)
   }
 
   window.requestAnimationFrame(renderLoop);
 
   hands.onResults((results) => {
-
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(
@@ -114,8 +113,10 @@ function setupTask(canvasId, taskFunction) {
         drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
                       {color: '#00FF00', lineWidth: 5});
       } */
-      drawLandmarks(canvasCtx, [positions[8]], {color: '#FF0000', lineWidth: 2});
+      drawLandmarks(canvasCtx, positions, {color: '#FF0000', lineWidth: 2});
 
+      // update skeleton
+      task.updatePose(positions);
     } else {
       positions = [];
     }
