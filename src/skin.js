@@ -247,7 +247,21 @@ export class SkinMesh {
 	}
 
 	createArmSkin() {
+		let xMaxOld = Math.max.apply(Math, armPositions);
+		let xMinOld = Math.min.apply(Math, armPositions);
+
+		let xMaxNew = 0.0;
+		let xMinNew = 5.0;
+
+		console.log(armPositions);
+
 		for (var i = 0; i < armPositions.length; i++) {
+			// need to convert these between -10 and 6
+			// let xNew = (armPositions[i] - xMinOld) / (xMaxOld - xMinOld) * (xMaxNew - xMinNew) + xMinNew;
+
+			// convert armPosition[i] between 6 and -10.0
+			// console.log(xNew);
+
 			this.mOriginalPositions.push(armPositions[i]);
 			this.mTransformedPositions.push(armPositions[i]);
 
@@ -256,6 +270,7 @@ export class SkinMesh {
 				this.mOriginalPositions[i] = -10.0 - this.mOriginalPositions[i];
 				this.mTransformedPositions[i] = -10.0 - this.mTransformedPositions[i];
 			}
+			
 		}
 
 		// Do zero offsetting for obj file using a '1'-indexing scheme
@@ -267,7 +282,7 @@ export class SkinMesh {
 		this.newIndices = new Array();
 
 		for (var i = 0; i < armIndices.length / 3; i++) {
-			var i0 = this.mIndices[i * 3 + 0];
+			var i0 = this.mIndices[i * 3];
 			var i1 = this.mIndices[i * 3 + 1];
 			var i2 = this.mIndices[i * 3 + 2];
 

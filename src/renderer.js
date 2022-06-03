@@ -209,7 +209,9 @@ export class HandRenderer {
       Matrix.rotate(this.pitch, 1, 0, 0)).multiply(
         Matrix.rotate(this.yaw, 0, 1, 0)).multiply(
           Matrix.translate(8, 0, 0)).multiply(
-            Matrix.rotate(30, 1, 0, 0));
+            Matrix.rotate(90, 0, 0, 1)).multiply(
+              Matrix.rotate(270, 1, 0, 0)
+            );
 
     if (this.skin) {
       this.skin.render(gl, view, projection, true);

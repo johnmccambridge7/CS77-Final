@@ -15,7 +15,7 @@ const hands = new Hands({
 });
 
 hands.setOptions({
-  maxNumHands: 2,
+  maxNumHands: 1,
   modelComplexity: 1,
   minDetectionConfidence: 0.7,
   minTrackingConfidence: 0.7
@@ -96,24 +96,14 @@ function setupTask(canvasId, taskFunction) {
 
   renderLoop = function() {
     task.render(gl, renderWidth, renderHeight);
-    setTimeout(() => window.requestAnimationFrame(renderLoop), 1000 / 60)
+    setTimeout(() => window.requestAnimationFrame(renderLoop), 5)
   }
 
   window.requestAnimationFrame(renderLoop);
 
   hands.onResults((results) => {
-    // canvasCtx.save();
-    // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    // canvasCtx.drawImage(
-    //     results.image, 0, 0, canvasElement.width, canvasElement.height);
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
       positions = results.multiHandLandmarks[0];
-
-      /* for (const landmarks of results.multiHandLandmarks) {
-        drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
-                      {color: '#00FF00', lineWidth: 5});
-      } */
-      // drawLandmarks(canvasCtx, positions, {color: '#FF0000', lineWidth: 2});
 
       // update skeleton
       task.updatePose(positions);
