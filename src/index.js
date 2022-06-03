@@ -109,7 +109,7 @@ function setupTask(canvasId, taskFunction) {
     }
   });
 
-  canvas.parentNode.appendChild(uiContainer);
+  document.getElementById('uiBox').appendChild(uiContainer);
 
   renderLoop = function() {
     task.render(gl, renderWidth, renderHeight);
@@ -126,16 +126,6 @@ function setupTask(canvasId, taskFunction) {
     } else {
       positions = [];
     }
-
-    // canvasCtx.restore();
-
-    /* if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-
-      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-      window.requestAnimationFrame(renderLoop);
-    } else {
-      positions = [];
-    }*/
   });
 
   const camera = new Camera(videoElement, {

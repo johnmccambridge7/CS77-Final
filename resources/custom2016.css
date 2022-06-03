@@ -6,7 +6,7 @@ body{
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 300;
 	padding-top: 0 !important;
-	background-color:#555A64;
+	background-color:black;
 /*	background-image: url(/images2014/bgcnbl.jpg);
 	background-size: cover;*/
 /*	background-repeat: no-repeat;
@@ -30,7 +30,7 @@ canvas {
 }
 
 .canvas-container {
-    margin: 40px auto;
+    margin: -10px auto;
     text-align: center;
 }
 

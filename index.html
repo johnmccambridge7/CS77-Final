@@ -13,12 +13,18 @@
     <script src="dist.js"></script>
   </head>
   <body onload="onLoad()">
-    <h2 style="color:white">CS77 Final Project: The Hand</h2>
+    <div style="padding:40px 0px 0px 40px" class="container">
+      <div class="row">
+        <div class="col" style="float:left;">
+          <h2 style="color:white">CS77 Final Project: The Hand</h2>
+          <h6>Jai Smith & John McCambridge</h6>
+        </div>
+        <div class="col" style="float:right;" id="uiBox"></div>
+      </div>
+    </div>
     <video class="input_video" hidden></video>
-
     <div class="canvas-container">
       <canvas id="output_gl_canvas"></canvas>
-      <center><h6>Jai Smith & John McCambridge</h6></center>
     </div>
     <script>
       function onLoad() {
