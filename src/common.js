@@ -1,25 +1,50 @@
 import { defaultArg } from './uiUtil';
 import { Vector } from './vector';
 import { Matrix } from './matrix';
+import { armNormals } from './arm';
 
 // Some common shaders
 export var SolidVertexSource = `
   uniform mat4 ModelViewProjection;
 
+  uniform mat4 ModelMatrix;
+  uniform mat4 NormalMatrix;
+
   attribute vec3 Position;
+  attribute vec3 Normal;
+  
+  varying vec3 Color;
+  varying vec4 ModelLightPosition;
+  varying vec3 norm;
+
+  const vec3 LightPosition = vec3(4, 1, 4);
+  const vec3 LightIntensity = vec3(20.0);
+  const vec3 ka = 0.3*vec3(1, 0.5, 0.5);
+  const vec3 kd = 0.7*vec3(1, 0.5, 0.5);
 
   void main() {
-    gl_Position = ModelViewProjection*vec4(Position, 1.0);
+    gl_Position = ModelViewProjection * vec4(Position, 1.0);
+    norm = normalize(mat3(NormalMatrix) * Normal);
+
+    vec4 transformedPosition = ModelMatrix * vec4(Position, 1.0);
+    vec3 lightDirection = normalize(LightPosition - transformedPosition.xyz);
+    highp float distanceSquared = distance(transformedPosition.xyz, LightPosition)*distance(transformedPosition.xyz, LightPosition);
+    vec3 lightDropoff = vec3(LightIntensity/(distanceSquared));
+
+    float diff = max(dot(norm, lightDirection), 0.0);
+    vec3 diffuse = diff * kd * lightDropoff;
+
+    Color = norm;
   }
 `;
 
 export var SolidFragmentSource = `
   precision highp float;
 
-  uniform vec4 Color;
+  varying vec3 Color;
 
   void main() {
-    gl_FragColor = Color;
+    gl_FragColor = vec4(Color, 1.0);
   }
 `;
 
@@ -30,6 +55,7 @@ export var WeightVertexSource = `
 	attribute float Weight;
 
 	varying float vWeight;
+  
   void main() {
     gl_Position = ModelViewProjection*vec4(Position, 1.0);
     vWeight = Weight;
@@ -105,6 +131,7 @@ export class TriangleMesh {
     this.drawEdges = defaultArg(drawEdges, true);
     this.faceColor = defaultArg(faceColor, new Vector(1, 1, 1));
     this.edgeColor = defaultArg(edgeColor, new Vector(0.0, 0.0, 1.0));
+    this.normalVbo = createVertexBuffer(gl, armNormals);
 
     this.positionVbo = createVertexBuffer(gl, vertexPositions);
     if (this.drawFaces) {
@@ -129,6 +156,9 @@ export class TriangleMesh {
 
     gl.useProgram(this.shaderProgram);
     gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "ModelViewProjection"), false, modelViewProjection.transpose().m);
+    gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "ModelMatrix"), false, model.transpose().m); 
+    gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "NormalMatrix"), false, model.inverse().transpose().transpose().m); 
+
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionVbo);
 
@@ -136,10 +166,20 @@ export class TriangleMesh {
     gl.enableVertexAttribArray(positionAttrib);
     gl.vertexAttribPointer(positionAttrib, 3, gl.FLOAT, false, 0, 0);
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.normalVbo);
+    var normalAttrib = gl.getAttribLocation(this.shaderProgram, "Normal");
+    if (normalAttrib >= 0) {
+        gl.enableVertexAttribArray(normalAttrib);
+        gl.vertexAttribPointer(normalAttrib, 3, gl.FLOAT, false, 0, 0);
+    }
+
     if (this.drawFaces) {
       gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "ModelViewProjection"), false, modelViewProjection.transpose().m);
       gl.uniform1f(gl.getUniformLocation(this.shaderProgram, "EdgeWeight"), 0);
-      gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.faceColor.x, this.faceColor.y, this.faceColor.z, 1);
+      // gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.faceColor.x, this.faceColor.y, this.faceColor.z, 1);
+      // gl.uniform3f(gl.getAttribLocation(this.shaderProgram, "Position"), positionAttrib);
+
+
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexIbo);
       gl.drawElements(gl.TRIANGLES, this.indexCount, gl.UNSIGNED_SHORT, 0);
     }
@@ -150,7 +190,7 @@ export class TriangleMesh {
       modelViewProjection = Matrix.translate(0, 0, -1e-4).multiply(modelViewProjection);
       gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "ModelViewProjection"), false, modelViewProjection.transpose().m);
       gl.uniform1f(gl.getUniformLocation(this.shaderProgram, "EdgeWeight"), 1);
-      gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.edgeColor.x, this.edgeColor.y, this.edgeColor.z, 1);
+      // gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.edgeColor.x, this.edgeColor.y, this.edgeColor.z, 1);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.edgeIndexIbo);
       gl.drawElements(gl.LINES, this.edgeIndexCount, gl.UNSIGNED_SHORT, 0);
     }
