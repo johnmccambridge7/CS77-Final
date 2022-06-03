@@ -29,8 +29,8 @@ export class Joint {
       CubePositions,
       CubeIndices,
       shader,
-      true,
-      true,
+      false,
+      false,
       new Vector(1.0, 0.0, 0.0),
       new Vector(1.0, 0.0, 0.0)
     );

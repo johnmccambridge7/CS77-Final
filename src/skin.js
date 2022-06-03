@@ -96,12 +96,12 @@ export class SkinMesh {
 
 	// Helper method to get a vertex with 'id'
 	getVertex(idx) {
-		return new Vector(this.mOriginalPositions[idx * 3 + 0], this.mOriginalPositions[idx * 3 + 1], this.mOriginalPositions[idx * 3 + 2]);
+		return new Vector(this.mOriginalPositions[idx * 3], this.mOriginalPositions[idx * 3 + 1], this.mOriginalPositions[idx * 3 + 2]);
 	}
 
 	// Helper method to set a transformed vertex into the correct location.
 	setTransformedVertex(idx, vtx) {
-		this.mTransformedPositions[idx * 3 + 0] = vtx.x;
+		this.mTransformedPositions[idx * 3] = vtx.x;
 		this.mTransformedPositions[idx * 3 + 1] = vtx.y;
 		this.mTransformedPositions[idx * 3 + 2] = vtx.z;
 	}

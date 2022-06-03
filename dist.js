@@ -7529,12 +7529,12 @@ class SkinMesh {
 
 	// Helper method to get a vertex with 'id'
 	getVertex(idx) {
-		return new Vector(this.mOriginalPositions[idx * 3 + 0], this.mOriginalPositions[idx * 3 + 1], this.mOriginalPositions[idx * 3 + 2]);
+		return new Vector(this.mOriginalPositions[idx * 3], this.mOriginalPositions[idx * 3 + 1], this.mOriginalPositions[idx * 3 + 2]);
 	}
 
 	// Helper method to set a transformed vertex into the correct location.
 	setTransformedVertex(idx, vtx) {
-		this.mTransformedPositions[idx * 3 + 0] = vtx.x;
+		this.mTransformedPositions[idx * 3] = vtx.x;
 		this.mTransformedPositions[idx * 3 + 1] = vtx.y;
 		this.mTransformedPositions[idx * 3 + 2] = vtx.z;
 	}
@@ -7893,8 +7893,8 @@ class Joint {
       CubePositions,
       CubeIndices,
       shader,
-      true,
-      true,
+      false,
+      false,
       new Vector(1.0, 0.0, 0.0),
       new Vector(1.0, 0.0, 0.0)
     );
@@ -8197,7 +8197,7 @@ class HandRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var projection = Matrix.perspective(60, w / h, 0.1, 100);
-    var view = Matrix.translate(-8, 0, -10).multiply(
+    var view = Matrix.translate(-8, 0, -6).multiply(
       Matrix.rotate(this.pitch, 1, 0, 0)).multiply(
         Matrix.rotate(this.yaw, 0, 1, 0)).multiply(
           Matrix.translate(8, 0, 0)).multiply(
@@ -8329,7 +8329,6 @@ function setupTask(canvasId, taskFunction) {
   hands.onResults((results) => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
       positions = results.multiHandLandmarks[0];
-
       // update skeleton
       task.updatePose(positions);
     } else {

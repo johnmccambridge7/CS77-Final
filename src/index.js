@@ -104,7 +104,6 @@ function setupTask(canvasId, taskFunction) {
   hands.onResults((results) => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
       positions = results.multiHandLandmarks[0];
-
       // update skeleton
       task.updatePose(positions);
     } else {
