@@ -1,7 +1,8 @@
 import {
   createShaderProgram,
-  SolidFragmentSource,
-  SolidVertexSource,
+
+  SolidMeshFragmentSource,
+  SolidMeshVertexSource,
   TriangleMesh
 } from './common';
 import { Vector } from './vector';
@@ -23,7 +24,7 @@ export class Joint {
     this.mBindingMatrix = null;
     this.gl = gl;
 
-    this.shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
+    this.shader = createShaderProgram(gl, SolidMeshVertexSource, SolidMeshFragmentSource);
     this.mesh = new TriangleMesh(
       gl,
       CubePositions,
@@ -31,8 +32,8 @@ export class Joint {
       this.shader,
       false,
       false,
-      new Vector(1.0, 0.0, 0.0),
-      new Vector(1.0, 0.0, 0.0)
+      new Vector(0.0, 0.0, 0.0),
+      new Vector(0.0, 1.0, 0.0)
     );
 
     this.mJointAngle = null;
@@ -49,8 +50,8 @@ export class Joint {
       this.shader,
       state,
       state,
-      new Vector(1.0, 0.0, 0.0),
-      new Vector(1.0, 0.0, 0.0)
+      new Vector(0.0, 0.0, 0.0),
+      new Vector(0.0, 1.0, 0.0)
     );
   }
 

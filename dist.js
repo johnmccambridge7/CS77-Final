@@ -9873,7 +9873,7 @@ class SkinMesh {
 		this.mSkinMode = null;
 
 		// Various shaders
-		this.shader = createShaderProgram(gl, SolidMeshVertexSource, SolidMeshFragmentSource);
+		this.shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
 		this.wShader = createShaderProgram(gl, WeightVertexSource, WeightFragmentSource);
 	}
 
@@ -10265,7 +10265,7 @@ class Joint {
     this.mBindingMatrix = null;
     this.gl = gl;
 
-    this.shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
+    this.shader = createShaderProgram(gl, SolidMeshVertexSource, SolidMeshFragmentSource);
     this.mesh = new TriangleMesh(
       gl,
       CubePositions,
@@ -10273,8 +10273,8 @@ class Joint {
       this.shader,
       false,
       false,
-      new Vector(1.0, 0.0, 0.0),
-      new Vector(1.0, 0.0, 0.0)
+      new Vector(0.0, 0.0, 0.0),
+      new Vector(0.0, 1.0, 0.0)
     );
 
     this.mJointAngle = null;
@@ -10291,8 +10291,8 @@ class Joint {
       this.shader,
       state,
       state,
-      new Vector(1.0, 0.0, 0.0),
-      new Vector(1.0, 0.0, 0.0)
+      new Vector(0.0, 0.0, 0.0),
+      new Vector(0.0, 1.0, 0.0)
     );
   }
 
@@ -10515,8 +10515,8 @@ class HandRenderer {
   }
 
   toggleBones() {
-    // this.showBones = !this.showBones;
-    this.skin.toggleBones(true);
+    this.showBones = !this.showBones;
+    this.skin.toggleBones(this.showBones);
   }
 
   updatePose(positions) {
@@ -10712,12 +10712,18 @@ function setupTask(canvasId, taskFunction) {
   });
 
   var uiContainer = div();
+  
   var groupTarget = div();
+  var boneControl = div();
 
   uiContainer.appendChild(div('button-group-container', groupTarget));
+  uiContainer.appendChild(div('button-group-container', boneControl));
 
   // task.toggleShading('lambertian');
-  task.toggleBones();
+
+  new ButtonGroup(boneControl, ["Hide Bones", "Show Bones"], function(idx) {
+    task.toggleBones();
+  });
 
   new ButtonGroup(groupTarget, ["Lambertian", "Normals", "Vertex Mesh"], function(idx) {
     if (idx == 0) {

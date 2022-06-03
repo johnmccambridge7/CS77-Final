@@ -76,7 +76,7 @@ export class SkinMesh {
 		this.mSkinMode = null;
 
 		// Various shaders
-		this.shader = createShaderProgram(gl, SolidMeshVertexSource, SolidMeshFragmentSource);
+		this.shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
 		this.wShader = createShaderProgram(gl, WeightVertexSource, WeightFragmentSource);
 	}
 

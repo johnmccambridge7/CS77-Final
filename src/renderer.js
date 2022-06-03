@@ -132,8 +132,8 @@ export class HandRenderer {
   }
 
   toggleBones() {
-    // this.showBones = !this.showBones;
-    this.skin.toggleBones(true);
+    this.showBones = !this.showBones;
+    this.skin.toggleBones(this.showBones);
   }
 
   updatePose(positions) {
