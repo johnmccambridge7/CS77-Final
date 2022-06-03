@@ -9570,7 +9570,6 @@ var armNormals = [
 0.385391,0.497427,-6.251485
 ];
 
-// Some common shaders
 var SolidVertexSource = `
   uniform mat4 ModelViewProjection;
 
@@ -9602,6 +9601,43 @@ var SolidVertexSource = `
     vec3 diffuse = diff * kd * lightDropoff;
 
     Color = diffuse + ka;
+  }
+`;
+
+var SolidNormalVertexSource = `
+  uniform mat4 ModelViewProjection;
+
+  uniform mat4 ModelMatrix;
+  uniform mat4 NormalMatrix;
+
+  attribute vec3 Position;
+  attribute vec3 Normal;
+  
+  varying vec3 Color;
+  varying vec4 ModelLightPosition;
+  varying vec3 norm;
+
+  void main() {
+    gl_Position = ModelViewProjection * vec4(Position, 1.0);
+    norm = normalize(mat3(NormalMatrix) * Normal);
+
+    Color = norm;
+  }
+`;
+
+var SolidMeshVertexSource = `
+  uniform mat4 ModelViewProjection;
+  attribute vec3 Position;
+  void main() {
+    gl_Position = ModelViewProjection*vec4(Position, 1.0);
+  }
+`;
+
+var SolidMeshFragmentSource = `
+  precision highp float;
+  uniform vec4 Color;
+  void main() {
+    gl_FragColor = Color;
   }
 `;
 
@@ -9736,7 +9772,7 @@ class TriangleMesh {
     if (this.drawFaces) {
       gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "ModelViewProjection"), false, modelViewProjection.transpose().m);
       gl.uniform1f(gl.getUniformLocation(this.shaderProgram, "EdgeWeight"), 0);
-      // gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.faceColor.x, this.faceColor.y, this.faceColor.z, 1);
+      gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.faceColor.x, this.faceColor.y, this.faceColor.z, 1);
       // gl.uniform3f(gl.getAttribLocation(this.shaderProgram, "Position"), positionAttrib);
 
 
@@ -9750,7 +9786,7 @@ class TriangleMesh {
       modelViewProjection = Matrix.translate(0, 0, -1e-4).multiply(modelViewProjection);
       gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "ModelViewProjection"), false, modelViewProjection.transpose().m);
       gl.uniform1f(gl.getUniformLocation(this.shaderProgram, "EdgeWeight"), 1);
-      // gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.edgeColor.x, this.edgeColor.y, this.edgeColor.z, 1);
+      gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.edgeColor.x, this.edgeColor.y, this.edgeColor.z, 1);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.edgeIndexIbo);
       gl.drawElements(gl.LINES, this.edgeIndexCount, gl.UNSIGNED_SHORT, 0);
     }
@@ -9837,7 +9873,7 @@ class SkinMesh {
 		this.mSkinMode = null;
 
 		// Various shaders
-		this.shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
+		this.shader = createShaderProgram(gl, SolidMeshVertexSource, SolidMeshFragmentSource);
 		this.wShader = createShaderProgram(gl, WeightVertexSource, WeightFragmentSource);
 	}
 
@@ -10075,7 +10111,17 @@ class SkinMesh {
 		}
 	}
 
-	showBones(state) {
+	toggleShading(shading) {
+		if (shading === 'normals') {
+			this.shader = createShaderProgram(this.gl, SolidNormalVertexSource, SolidFragmentSource);
+		} else if (shading === 'lambertian') {
+			this.shader = createShaderProgram(this.gl, SolidVertexSource, SolidFragmentSource);
+		} else {
+			this.shader = createShaderProgram(this.gl, SolidMeshVertexSource, SolidMeshFragmentSource);
+		}
+	}
+
+	toggleBones(state) {
 		for (var i = 0; i < this.mSkeleton.getNumJoints(); i++) {
 			this.mSkeleton.getJoint(i).toggleVisible(state);
 		}
@@ -10464,9 +10510,13 @@ class HandRenderer {
     );
   }
 
+  toggleShading(shading) {
+    this.skin.toggleShading(shading);
+  }
+
   toggleBones() {
-    this.showBones = !this.showBones;
-    this.skin.showBones(this.showBones);
+    // this.showBones = !this.showBones;
+    this.skin.toggleBones(true);
   }
 
   updatePose(positions) {
@@ -10666,8 +10716,17 @@ function setupTask(canvasId, taskFunction) {
 
   uiContainer.appendChild(div('button-group-container', groupTarget));
 
-  new ButtonGroup(groupTarget, ["Show Bones", "Disable Lambertian", "Enable Normals"], function(idx) {
-    task.toggleBones();
+  // task.toggleShading('lambertian');
+  task.toggleBones();
+
+  new ButtonGroup(groupTarget, ["Lambertian", "Normals", "Vertex Mesh"], function(idx) {
+    if (idx == 0) {
+      task.toggleShading('lambertian');
+    } else if (idx == 1) {
+      task.toggleShading('normals');
+    } else if (idx == 2) {
+      task.toggleShading('mesh');
+    }
   });
 
   canvas.parentNode.appendChild(uiContainer);

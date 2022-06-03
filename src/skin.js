@@ -5,7 +5,10 @@ import {
 	WeightVertexSource,
 	WeightFragmentSource,
 	WeightShadedTriangleMesh,
-	TriangleMesh
+	TriangleMesh,
+	SolidNormalVertexSource,
+	SolidMeshVertexSource,
+	SolidMeshFragmentSource
 } from './common';
 import {
 	armPositions,
@@ -73,7 +76,7 @@ export class SkinMesh {
 		this.mSkinMode = null;
 
 		// Various shaders
-		this.shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
+		this.shader = createShaderProgram(gl, SolidMeshVertexSource, SolidMeshFragmentSource);
 		this.wShader = createShaderProgram(gl, WeightVertexSource, WeightFragmentSource);
 	}
 
@@ -314,7 +317,17 @@ export class SkinMesh {
 		}
 	}
 
-	showBones(state) {
+	toggleShading(shading) {
+		if (shading === 'normals') {
+			this.shader = createShaderProgram(this.gl, SolidNormalVertexSource, SolidFragmentSource);
+		} else if (shading === 'lambertian') {
+			this.shader = createShaderProgram(this.gl, SolidVertexSource, SolidFragmentSource);
+		} else {
+			this.shader = createShaderProgram(this.gl, SolidMeshVertexSource, SolidMeshFragmentSource);
+		}
+	}
+
+	toggleBones(state) {
 		for (var i = 0; i < this.mSkeleton.getNumJoints(); i++) {
 			this.mSkeleton.getJoint(i).toggleVisible(state);
 		}

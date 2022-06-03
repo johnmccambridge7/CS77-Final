@@ -127,9 +127,13 @@ export class HandRenderer {
     );
   }
 
+  toggleShading(shading) {
+    this.skin.toggleShading(shading);
+  }
+
   toggleBones() {
-    this.showBones = !this.showBones;
-    this.skin.showBones(this.showBones);
+    // this.showBones = !this.showBones;
+    this.skin.toggleBones(true);
   }
 
   updatePose(positions) {

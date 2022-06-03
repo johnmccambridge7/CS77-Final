@@ -90,8 +90,17 @@ function setupTask(canvasId, taskFunction) {
 
   uiContainer.appendChild(div('button-group-container', groupTarget));
 
-  new ButtonGroup(groupTarget, ["Show Bones", "Disable Lambertian", "Enable Normals"], function(idx) {
-    task.toggleBones();
+  // task.toggleShading('lambertian');
+  task.toggleBones();
+
+  new ButtonGroup(groupTarget, ["Lambertian", "Normals", "Vertex Mesh"], function(idx) {
+    if (idx == 0) {
+      task.toggleShading('lambertian');
+    } else if (idx == 1) {
+      task.toggleShading('normals');
+    } else if (idx == 2) {
+      task.toggleShading('mesh');
+    }
   });
 
   canvas.parentNode.appendChild(uiContainer);

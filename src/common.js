@@ -3,7 +3,7 @@ import { Vector } from './vector';
 import { Matrix } from './matrix';
 import { armNormals } from './arm';
 
-// Some common shaders
+
 export var SolidVertexSource = `
   uniform mat4 ModelViewProjection;
 
@@ -35,6 +35,43 @@ export var SolidVertexSource = `
     vec3 diffuse = diff * kd * lightDropoff;
 
     Color = diffuse + ka;
+  }
+`;
+
+export var SolidNormalVertexSource = `
+  uniform mat4 ModelViewProjection;
+
+  uniform mat4 ModelMatrix;
+  uniform mat4 NormalMatrix;
+
+  attribute vec3 Position;
+  attribute vec3 Normal;
+  
+  varying vec3 Color;
+  varying vec4 ModelLightPosition;
+  varying vec3 norm;
+
+  void main() {
+    gl_Position = ModelViewProjection * vec4(Position, 1.0);
+    norm = normalize(mat3(NormalMatrix) * Normal);
+
+    Color = norm;
+  }
+`;
+
+export var SolidMeshVertexSource = `
+  uniform mat4 ModelViewProjection;
+  attribute vec3 Position;
+  void main() {
+    gl_Position = ModelViewProjection*vec4(Position, 1.0);
+  }
+`;
+
+export var SolidMeshFragmentSource = `
+  precision highp float;
+  uniform vec4 Color;
+  void main() {
+    gl_FragColor = Color;
   }
 `;
 
@@ -176,7 +213,7 @@ export class TriangleMesh {
     if (this.drawFaces) {
       gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "ModelViewProjection"), false, modelViewProjection.transpose().m);
       gl.uniform1f(gl.getUniformLocation(this.shaderProgram, "EdgeWeight"), 0);
-      // gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.faceColor.x, this.faceColor.y, this.faceColor.z, 1);
+      gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.faceColor.x, this.faceColor.y, this.faceColor.z, 1);
       // gl.uniform3f(gl.getAttribLocation(this.shaderProgram, "Position"), positionAttrib);
 
 
@@ -190,7 +227,7 @@ export class TriangleMesh {
       modelViewProjection = Matrix.translate(0, 0, -1e-4).multiply(modelViewProjection);
       gl.uniformMatrix4fv(gl.getUniformLocation(this.shaderProgram, "ModelViewProjection"), false, modelViewProjection.transpose().m);
       gl.uniform1f(gl.getUniformLocation(this.shaderProgram, "EdgeWeight"), 1);
-      // gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.edgeColor.x, this.edgeColor.y, this.edgeColor.z, 1);
+      gl.uniform4f(gl.getUniformLocation(this.shaderProgram, "Color"), this.edgeColor.x, this.edgeColor.y, this.edgeColor.z, 1);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.edgeIndexIbo);
       gl.drawElements(gl.LINES, this.edgeIndexCount, gl.UNSIGNED_SHORT, 0);
     }
