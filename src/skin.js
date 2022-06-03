@@ -190,12 +190,7 @@ export class SkinMesh {
 	// However in case of animations, you can use this function to do the same functionality.
 	updateSkin() {
 		this.linearBlendSkinning();
-
-		if (!this.mShowWeights)
-			this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.mIndices, this.shader);
-
-		else
-			this.mWeightMesh = new WeightShadedTriangleMesh(this.gl, this.mTransformedPositions, this.mSelectedJointWeights, this.mIndices, this.wShader);
+		this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.mIndices, this.shader);
 	}
 
 	// Creates a cylinder mesh along the x-axis
@@ -316,6 +311,12 @@ export class SkinMesh {
 
 		else {
 			this.computeRigidWeights();
+		}
+	}
+
+	showBones(state) {
+		for (var i = 0; i < this.mSkeleton.getNumJoints(); i++) {
+			this.mSkeleton.getJoint(i).toggleVisible(state);
 		}
 	}
 

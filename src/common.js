@@ -17,10 +17,10 @@ export var SolidVertexSource = `
   varying vec4 ModelLightPosition;
   varying vec3 norm;
 
-  const vec3 LightPosition = vec3(4, 1, 4);
+  const vec3 LightPosition = vec3(0, -4, 2);
   const vec3 LightIntensity = vec3(20.0);
-  const vec3 ka = 0.3*vec3(1, 0.5, 0.5);
-  const vec3 kd = 0.7*vec3(1, 0.5, 0.5);
+  const vec3 ka = 0.3*vec3(0.878431373,0.674509804,0.411764706);
+  const vec3 kd = 0.7*vec3(0.878431373,0.674509804,0.411764706);
 
   void main() {
     gl_Position = ModelViewProjection * vec4(Position, 1.0);
@@ -34,7 +34,7 @@ export var SolidVertexSource = `
     float diff = max(dot(norm, lightDirection), 0.0);
     vec3 diffuse = diff * kd * lightDropoff;
 
-    Color = norm;
+    Color = diffuse + ka;
   }
 `;
 

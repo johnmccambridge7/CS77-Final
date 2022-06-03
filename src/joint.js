@@ -23,12 +23,12 @@ export class Joint {
     this.mBindingMatrix = null;
     this.gl = gl;
 
-    let shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
+    this.shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
     this.mesh = new TriangleMesh(
       gl,
       CubePositions,
       CubeIndices,
-      shader,
+      this.shader,
       false,
       false,
       new Vector(1.0, 0.0, 0.0),
@@ -39,6 +39,19 @@ export class Joint {
     this.mJointAxis = null;
 
     recomputeJointAngleAndAxis(this);
+  }
+
+  toggleVisible(state) {
+    this.mesh = new TriangleMesh(
+      this.gl,
+      CubePositions,
+      CubeIndices,
+      this.shader,
+      state,
+      state,
+      new Vector(1.0, 0.0, 0.0),
+      new Vector(1.0, 0.0, 0.0)
+    );
   }
 
   setJointOrigin(v0) {

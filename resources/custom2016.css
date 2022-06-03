@@ -17,6 +17,7 @@ body{
 
 canvas { 
     border: 0;
+	border-radius: 15px;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;

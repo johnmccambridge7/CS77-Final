@@ -47,8 +47,8 @@ function setupTask(canvasId, taskFunction) {
 
   var renderWidth, renderHeight;
   function computeCanvasSize() {
-    renderWidth = Math.min(canvas.parentNode.clientWidth - 20, 820);
-    renderHeight = Math.floor(renderWidth * 9.0 / 16.0);
+    renderWidth = 1600; // Math.min(canvas.parentNode.clientWidth - 20, 820);
+    renderHeight = 800; // Math.floor(renderWidth * 9.0 / 16.0);
     canvas.width = renderWidth;
     canvas.height = renderHeight;
     gl.viewport(0, 0, renderWidth, renderHeight);
@@ -68,6 +68,7 @@ function setupTask(canvasId, taskFunction) {
     lastMouseX = event.screenX;
     lastMouseY = event.screenY;
   };
+  
   canvas.addEventListener('mousedown', function(event) {
     if (!mouseDown && event.button == 0) {
       mouseDown = true;
@@ -86,17 +87,18 @@ function setupTask(canvasId, taskFunction) {
 
   var uiContainer = div();
   var groupTarget = div();
-  var weightSelector = ["Hide Weights"];
 
   uiContainer.appendChild(div('button-group-container', groupTarget));
-  new ButtonGroup(groupTarget, weightSelector, function(idx) {
-    task.showJointWeights(idx - 1);
+
+  new ButtonGroup(groupTarget, ["Show Bones", "Disable Lambertian", "Enable Normals"], function(idx) {
+    task.toggleBones();
   });
+
   canvas.parentNode.appendChild(uiContainer);
 
   renderLoop = function() {
     task.render(gl, renderWidth, renderHeight);
-    setTimeout(() => window.requestAnimationFrame(renderLoop), 5)
+    setTimeout(() => window.requestAnimationFrame(renderLoop), 1000/60)
   }
 
   window.requestAnimationFrame(renderLoop);

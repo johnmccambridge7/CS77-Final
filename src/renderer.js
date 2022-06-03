@@ -73,6 +73,7 @@ export class HandRenderer {
     // set camera pose
     this.pitch = 0;
     this.yaw = 0;
+    this.showBones = false;
 
     // Create a skin mesh
     this.skin = new SkinMesh(gl);
@@ -124,6 +125,11 @@ export class HandRenderer {
       m[4] * v.x + m[5] * v.y + m[6] * v.z,
       m[8] * v.x + m[9] * v.y + m[10] * v.z
     );
+  }
+
+  toggleBones() {
+    this.showBones = !this.showBones;
+    this.skin.showBones(this.showBones);
   }
 
   updatePose(positions) {

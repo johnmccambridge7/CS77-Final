@@ -9584,10 +9584,10 @@ var SolidVertexSource = `
   varying vec4 ModelLightPosition;
   varying vec3 norm;
 
-  const vec3 LightPosition = vec3(4, 1, 4);
+  const vec3 LightPosition = vec3(0, -4, 2);
   const vec3 LightIntensity = vec3(20.0);
-  const vec3 ka = 0.3*vec3(1, 0.5, 0.5);
-  const vec3 kd = 0.7*vec3(1, 0.5, 0.5);
+  const vec3 ka = 0.3*vec3(0.878431373,0.674509804,0.411764706);
+  const vec3 kd = 0.7*vec3(0.878431373,0.674509804,0.411764706);
 
   void main() {
     gl_Position = ModelViewProjection * vec4(Position, 1.0);
@@ -9601,7 +9601,7 @@ var SolidVertexSource = `
     float diff = max(dot(norm, lightDirection), 0.0);
     vec3 diffuse = diff * kd * lightDropoff;
 
-    Color = norm;
+    Color = diffuse + ka;
   }
 `;
 
@@ -9954,12 +9954,7 @@ class SkinMesh {
 	// However in case of animations, you can use this function to do the same functionality.
 	updateSkin() {
 		this.linearBlendSkinning();
-
-		if (!this.mShowWeights)
-			this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.mIndices, this.shader);
-
-		else
-			this.mWeightMesh = new WeightShadedTriangleMesh(this.gl, this.mTransformedPositions, this.mSelectedJointWeights, this.mIndices, this.wShader);
+		this.mesh = new TriangleMesh(this.gl, this.mTransformedPositions, this.mIndices, this.shader);
 	}
 
 	// Creates a cylinder mesh along the x-axis
@@ -10077,6 +10072,12 @@ class SkinMesh {
 
 		else {
 			this.computeRigidWeights();
+		}
+	}
+
+	showBones(state) {
+		for (var i = 0; i < this.mSkeleton.getNumJoints(); i++) {
+			this.mSkeleton.getJoint(i).toggleVisible(state);
 		}
 	}
 
@@ -10218,12 +10219,12 @@ class Joint {
     this.mBindingMatrix = null;
     this.gl = gl;
 
-    let shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
+    this.shader = createShaderProgram(gl, SolidVertexSource, SolidFragmentSource);
     this.mesh = new TriangleMesh(
       gl,
       CubePositions,
       CubeIndices,
-      shader,
+      this.shader,
       false,
       false,
       new Vector(1.0, 0.0, 0.0),
@@ -10234,6 +10235,19 @@ class Joint {
     this.mJointAxis = null;
 
     recomputeJointAngleAndAxis(this);
+  }
+
+  toggleVisible(state) {
+    this.mesh = new TriangleMesh(
+      this.gl,
+      CubePositions,
+      CubeIndices,
+      this.shader,
+      state,
+      state,
+      new Vector(1.0, 0.0, 0.0),
+      new Vector(1.0, 0.0, 0.0)
+    );
   }
 
   setJointOrigin(v0) {
@@ -10396,6 +10410,7 @@ class HandRenderer {
     // set camera pose
     this.pitch = 0;
     this.yaw = 0;
+    this.showBones = false;
 
     // Create a skin mesh
     this.skin = new SkinMesh(gl);
@@ -10447,6 +10462,11 @@ class HandRenderer {
       m[4] * v.x + m[5] * v.y + m[6] * v.z,
       m[8] * v.x + m[9] * v.y + m[10] * v.z
     );
+  }
+
+  toggleBones() {
+    this.showBones = !this.showBones;
+    this.skin.showBones(this.showBones);
   }
 
   updatePose(positions) {
@@ -10603,8 +10623,8 @@ function setupTask(canvasId, taskFunction) {
 
   var renderWidth, renderHeight;
   function computeCanvasSize() {
-    renderWidth = Math.min(canvas.parentNode.clientWidth - 20, 820);
-    renderHeight = Math.floor(renderWidth * 9.0 / 16.0);
+    renderWidth = 1600; // Math.min(canvas.parentNode.clientWidth - 20, 820);
+    renderHeight = 800; // Math.floor(renderWidth * 9.0 / 16.0);
     canvas.width = renderWidth;
     canvas.height = renderHeight;
     gl.viewport(0, 0, renderWidth, renderHeight);
@@ -10624,6 +10644,7 @@ function setupTask(canvasId, taskFunction) {
     lastMouseX = event.screenX;
     lastMouseY = event.screenY;
   };
+  
   canvas.addEventListener('mousedown', function(event) {
     if (!mouseDown && event.button == 0) {
       mouseDown = true;
@@ -10642,17 +10663,18 @@ function setupTask(canvasId, taskFunction) {
 
   var uiContainer = div();
   var groupTarget = div();
-  var weightSelector = ["Hide Weights"];
 
   uiContainer.appendChild(div('button-group-container', groupTarget));
-  new ButtonGroup(groupTarget, weightSelector, function(idx) {
-    task.showJointWeights(idx - 1);
+
+  new ButtonGroup(groupTarget, ["Show Bones", "Disable Lambertian", "Enable Normals"], function(idx) {
+    task.toggleBones();
   });
+
   canvas.parentNode.appendChild(uiContainer);
 
   renderLoop = function() {
     task.render(gl, renderWidth, renderHeight);
-    setTimeout(() => window.requestAnimationFrame(renderLoop), 5);
+    setTimeout(() => window.requestAnimationFrame(renderLoop), 1000/60);
   };
 
   window.requestAnimationFrame(renderLoop);
