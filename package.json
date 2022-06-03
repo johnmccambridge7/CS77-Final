@@ -7,8 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
-    "dev": "yarn build && http-server . -o & yarn build -- -w",
-    "start": "yarn build && http-server . -o"
+    "dev": "yarn build && http-server dist -o & yarn build -- -w",
+    "start": "yarn build && http-server dist -o"
   },
   "dependencies": {
     "@mediapipe/camera_utils": "^0.3.1640029074",
@@ -16,7 +16,8 @@
     "@mediapipe/drawing_utils": "^0.3.1620248257",
     "@mediapipe/hands": "^0.4.1646424915",
     "compute-quantile": "^1.0.1",
-    "matrix-js": "^1.6.1"
+    "matrix-js": "^1.6.1",
+    "rollup-plugin-copy": "^3.4.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.0",

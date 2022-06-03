@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Live Pose Rendering</title>
+
+    <link href="resources/bootstrap.min.css" rel="stylesheet">
+    <link href="resources/custom2016.css" rel="stylesheet">
+
+    <script src="dist.js"></script>
+  </head>
+  <body onload="onLoad()">
+    <div style="padding:40px 0px 0px 40px" class="container">
+      <div class="row">
+        <div class="col" style="float:left;">
+          <h2 style="color:white">CS77 Final Project: The Hand</h2>
+          <h6>Jai Smith & John McCambridge</h6>
+        </div>
+        <div class="col" style="float:right;" id="uiBox"></div>
+      </div>
+    </div>
+    <video class="input_video" hidden></video>
+    <div class="canvas-container">
+      <canvas id="output_gl_canvas"></canvas>
+    </div>
+    <script>
+      function onLoad() {
+        initialize('output_gl_canvas');
+      }
+    </script>
+  </body>
+</html>
